@@ -1,0 +1,5 @@
+# add this to your crontab with `crontab -e`
+
+# exit vim with `:wq`
+
+* * * * * /full/path/to/repo/run-app-status-light.sh

@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "light-control"
+version = "0.1.0"
+description = ""
+authors = ["Kyle Cole <54221202+cakeholeDC@users.noreply.github.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+aiohttp = "^3.8.1"
+pysmartthings = "^0.7.7"
+python-dotenv = "^0.19.2"
+psutil = "^5.9.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.5"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,6 @@
+# add this to your crontab with `crontab -e`
+
+# exit vim with `:wq`
+
+# every fifth minute between 9 and 17:00
+*/5 9-17 * * 1-5 /full/path/to/repo/run-app-status-light.sh > /dev/null 2>&1

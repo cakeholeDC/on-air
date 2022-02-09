@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd ~/dev/on-air
+
+./run-on-air.sh
