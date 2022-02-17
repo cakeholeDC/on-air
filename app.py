@@ -1,41 +1,27 @@
-import os
-from LightControl import lightsOn, lightsOff, lights_object, loop
-from hostActions import isVideoAppRunning, checkAndLogLightStatus
-
-DEVICE_NAME = os.getenv('DEVICE_NAME')
-STATUS_LOG = os.getenv('STATUS_LOG')
-
+from host.actions import is_trigger_app_running, get_and_log_device_status
+from api.actions import turn_off_and_log_status, turn_on_and_log_status
 
 if __name__ == '__main__':
-    webcamStatus = isVideoAppRunning()
+    webcamStatus = is_trigger_app_running()
     print(f"isAppOpen = {webcamStatus}")
 
-    lightStatus = checkAndLogLightStatus()
+    lightStatus = get_and_log_device_status()
     print(f"isLightOn = {lightStatus}")
 
-    hamster = True
     if webcamStatus and lightStatus:
-        pass
         # do nothing
+        pass
     if not webcamStatus and not lightStatus:
+        # do nothing
         pass
     elif webcamStatus and not lightStatus:
         # turn light on
-        loop.run_until_complete( lightsOn(lights_object, DEVICE_NAME) )
-        # write to local log file
-        f = open(STATUS_LOG, "w")
-        f.write(str(True))
-        f.close()
-
-        print("Webcam: ON AIR")
+        turn_on_and_log_status()
+        print("--- ON AIR ---")
     elif not webcamStatus and lightStatus:
         # turn light off
-        loop.run_until_complete( lightsOff(lights_object, DEVICE_NAME) )
-        # write to local log file
-        f = open(STATUS_LOG, "w")
-        f.write(str(False))
-        f.close()
-
-        print("Webcam: OFF AIR")
-    else: # not webcamStatus and not lightStatus
+        turn_off_and_log_status()
+        print("--- OFF AIR ---")
+    else: 
+        # something has gone terribly wrong
         pass

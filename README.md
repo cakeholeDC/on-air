@@ -25,21 +25,23 @@ This application utilizes the Samsung Smarttings API to control smart home devic
     - `cp .env.example .env`
 3. Open `.env` in your preferred code editor.
 4. Obtain a [smartthings personal access token](https://account.smartthings.com/tokens) fom the Smartthings developer hub.
-5. Set your personal access token as the value of `TOKEN` in `.env`
+5. Set your personal access token as the value of `SMARTTHINGS_TOKEN` in `.env`
 6. Use the API to discover devices:
-    - `poetry run python3 getDeviceList.py`
+    - `poetry run python3 get_device_list.py`
 7. Capture your desired device's `Label` from the output and set it as the value of `DEVICE_NAME` in `.env`
 
 ### Configure Applications
 1. Open the application(s) that you want to turn on the light.
 2. Run the following command to find the application's proces name. 
     - Replace _{app-name}_ with the application name.
-    - `poetry run python3 hostActions.py | grep {app-name}`
+    - `poetry run python3 host/actions.py | grep {app-name}`
     > **Note:** when searching for **_app-name_**, try using a short keyword like _"code"_ rather than _"Visual Studio Code"_
     > 
     > Sometimes, a process name is shortened to _"vscode"_ which would not show up with a multi word query.
+    >
+    > If you still cannot find your process name, run this command without adding ` | grep {app-name}` to see all processes. 
 3. Find the process name in the output.
-4. Copy & Paste the application name(s) into `VIDEO_LIST` in `.env`
+4. Copy & Paste the application name(s) into `TRIGGER_APPS` in `.env`
 
 ### Testing the Configuration
 Follow these steps to test your configiuration:

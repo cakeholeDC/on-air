@@ -1,23 +1,20 @@
 #!/bin/bash
 set -e
 
-# read -p "This script will create terminal aliases for controlling smartthings devices .Do you really want to do this? (Y/n) " -n 1 -r
-# echo    # (optional) move to a new line
+read -p "This script will create terminal aliases for controlling smartthings devices .Do you really want to do this? (Y/n) " -n 1 -r
 
-# if [[ $REPLY =~ ^[Yy]$ ]]
-# then
-    # indent everything here.
-    
-cp on-air ~
-cp off-air ~
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+    cp ./scripts/on-air ~
+    cp ./scripts/off-air ~
 
-echo "" >> ~/.bash_profile # newline for clarity
-echo "# Start OnAir Aliases" >> ~/.bash_profile
-echo 'alias onair="~/on-air"' >> ~/.bash_profile
-echo 'alias offair="~/off-air"' >> ~/.bash_profile
-echo "# End OnAir Aliases" >> ~/.bash_profile
+    echo "" >> ~/.bash_profile # newline for clarity
+    echo "# Start OnAir Aliases" >> ~/.bash_profile
+    echo 'alias onair="~/on-air"' >> ~/.bash_profile
+    echo 'alias offair="~/off-air"' >> ~/.bash_profile
+    echo "# End OnAir Aliases" >> ~/.bash_profile
 
-reset
+    reset
 
-echo "The shortcuts 'onair' and 'offair' are now setup."
-# echo "Please open a new terminal window before using your new shortcuts."
+    echo "The shortcuts 'onair' and 'offair' are now setup."
+fi

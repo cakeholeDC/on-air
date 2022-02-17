@@ -2,4 +2,4 @@
 
 source .venv/bin/activate
 
-poetry run python3 lightsOff.py
+poetry run python3 off_air.py
