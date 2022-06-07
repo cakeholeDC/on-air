@@ -3,6 +3,7 @@ import os
 import pysmartthings
 from api.Light import Light
 from dotenv import load_dotenv
+from api.colors import RED
 
 load_dotenv()
 token = os.getenv('SMARTTHINGS_TOKEN')
@@ -17,7 +18,7 @@ async def lights_on(object=lights_object, name=device_name):
         api = pysmartthings.SmartThings(session, token)
 
         await find_devices(api, object, name)
-        print(f"Turning on: {name}")
+        print(f"Turning on: {RED}{name}")
         await object.on()
 
 
@@ -29,7 +30,7 @@ async def lights_off(object=lights_object, name=device_name):
         api = pysmartthings.SmartThings(session, token)
 
         await find_devices(api, object, name)
-        print(f"Turning off: {name}")
+        print(f"Turning off: {RED}{name}")
         await object.off()
 
 

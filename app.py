@@ -17,11 +17,9 @@ if __name__ == '__main__':
     elif webcamStatus and not lightStatus:
         # turn light on
         turn_on_and_log_status()
-        print("--- ON AIR ---")
     elif not webcamStatus and lightStatus:
         # turn light off
         turn_off_and_log_status()
-        print("--- OFF AIR ---")
     else: 
         # something has gone terribly wrong
         pass
