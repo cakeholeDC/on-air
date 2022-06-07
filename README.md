@@ -14,6 +14,7 @@ This application utilizes the Samsung Smarttings API to control smart home devic
 ## Dependencies
 - python
 - [poetry](https://python-poetry.org/)
+    - It is recommended that you install poetry using [homebrew](https://formulae.brew.sh/formula/poetry)
 - [python-smartthings](https://pypi.org/project/python-smartthings/)
 
 ---
