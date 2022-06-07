@@ -2,5 +2,5 @@
 
 # exit vim with `:wq`
 
-# every fifth minute between 9 and 17:00
+# every fifth minute between 9 and 17:00, Monday-Friday
 */5 9-17 * * 1-5 /full/path/to/repo/run-app-status-light.sh > /dev/null 2>&1
