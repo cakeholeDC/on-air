@@ -1,12 +1,13 @@
 #!/bin/bash
 set -e
 
-read -p "This script will create terminal aliases for controlling smartthings devices .Do you really want to do this? (Y/n) " -n 1 -r
+read -p "This script will create terminal aliases for controlling smartthings devices. Do you really want to do this? (Y/n) " -n 1 -r
 
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
     cp ./scripts/on-air ~
     cp ./scripts/off-air ~
+    cp ~/.bash_profile ~/.bash_profile.before_onair # backup for good measure
 
     echo "" >> ~/.bash_profile # newline for clarity
     echo "# Start OnAir Aliases" >> ~/.bash_profile
