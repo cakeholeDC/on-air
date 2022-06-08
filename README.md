@@ -35,7 +35,7 @@ This application utilizes the Samsung Smarttings API to control smart home devic
 1. Open the application(s) that you want to turn on the light.
 2. Run the following command to find the application's proces name. 
     - Replace _{app-name}_ with the application name.
-    - `poetry run python3 host/actions.py | grep {app-name}`
+    - `poetry run python3 get_process_name.py | grep {app-name}`
     > **Note:** when searching for **_app-name_**, try using a short keyword like _"code"_ rather than _"Visual Studio Code"_
     > 
     > Sometimes, a process name is shortened to _"vscode"_ which would not show up with a multi word query.
