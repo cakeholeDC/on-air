@@ -5,7 +5,7 @@ description = ""
 authors = ["Kyle Cole <54221202+cakeholeDC@users.noreply.github.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.7.2"
 aiohttp = "^3.8.1"
 pysmartthings = "^0.7.7"
 python-dotenv = "^0.19.2"
@@ -13,6 +13,7 @@ psutil = "^5.9.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
+pylint = "^2.14.3"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
