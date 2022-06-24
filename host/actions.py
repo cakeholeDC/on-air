@@ -6,26 +6,25 @@ from api.actions import get_smartthings_device_status
 from logger import write_log_file
 
 TRIGGER_APPS = json.loads(os.getenv('TRIGGER_APPS'))
-DEVICE_NAME = os.getenv('DEVICE_NAME')
 STATUS_LOG = os.getenv('STATUS_LOG')
 
 def discover_process_names():
     for proc in psutil.process_iter():
         print(proc.name())
-        
+
 
 def is_trigger_app_running():
     '''
-    parses running processes and checkes if any TRIGGER_APPS are running
+    parses running processes and checks if any TRIGGER_APPS are running
 
     returns BOOLEAN
     '''
     processes = []
     for proc in psutil.process_iter():
         try:
-            processName = proc.name()
-            if processName in TRIGGER_APPS:
-                processes.append(processName)
+            process_name = proc.name()
+            if process_name in TRIGGER_APPS:
+                processes.append(process_name)
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
 
@@ -37,18 +36,18 @@ def get_and_log_device_status():
     '''
     returns BOOLEAN
 
-    Parses STATUS_LOG for device status. 
-    
+    Parses STATUS_LOG for device status.
+
     If STATUS_LOG is missing, fetches api.device.status and writes result to STATUS_LOG.
     '''
     log_exists = os.path.exists(STATUS_LOG)
 
     if log_exists:
         # read from STATUS_LOG
-        light_status = open(STATUS_LOG, "r").readlines()[0] == "True\n"
+        light_status = open(STATUS_LOG, "r").readlines()[0] == "True\n" # pylint: disable=[W1514, R1732]
     else:
         print("STATUS_LOG not present")
-        light_status = get_smartthings_device_status(DEVICE_NAME)
+        light_status = get_smartthings_device_status()
         # write to STATUS_LOG
         write_log_file(light_status)
 

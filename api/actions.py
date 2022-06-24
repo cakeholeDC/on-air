@@ -1,10 +1,10 @@
 import asyncio
-from api.LightControl import ( 
-    lights_on, 
-    lights_off, 
+from api.LightControl import (
+    lights_on,
+    lights_off,
     get_device_status,
     list_devices,
-    lights_object, 
+    lights_object,
     device_id
 )
 from logger import write_log_file
@@ -25,8 +25,8 @@ def turn_off_and_log_status():
     loop.run_until_complete( lights_off(lights_object, guid=device_id) )
     write_log_file(False)
 
-def get_smartthings_device_list():
+def get_smartthings_device_list(): # pylint: disable=[C0116]
     return loop.run_until_complete( list_devices() )
 
-def get_smartthings_device_status(device_name):
+def get_smartthings_device_status(): # pylint: disable=[C0116]
     return loop.run_until_complete( get_device_status(guid=device_id) )

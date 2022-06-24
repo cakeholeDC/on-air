@@ -1,9 +1,9 @@
-import aiohttp
 import os
+import aiohttp
 import pysmartthings
-from api.Light import Light
 from dotenv import load_dotenv
 from api.colors import RED
+from api.Light import Light
 
 load_dotenv()
 token = os.getenv('SMARTTHINGS_TOKEN')
@@ -33,13 +33,13 @@ async def lights_off(object=lights_object, guid=device_id):
         await object.off()
 
 async def get_device_status(guid=device_id):
-    print(f"getting api.device.status for {object.device.label}")
     async with aiohttp.ClientSession() as session:
         api = pysmartthings.SmartThings(session, token)
 
         devices = await api.devices()
         for device in devices:
             if device.device_id == guid:
+                print(f"getting api.device.status for {device.label}")
                 await device.status.refresh()
                 print(f"{device.label} = {device.status.switch}")
                 return device.status.switch
@@ -68,11 +68,11 @@ async def list_devices():
     async with aiohttp.ClientSession() as session:
         api = pysmartthings.SmartThings(session, token)
 
-        await getDevices(api)
+        await get_devices(api)
         print_large_divider()
 
 
-async def getDevices(api):
+async def get_devices(api):
     '''
     prints a list of api.devices to the console
     '''

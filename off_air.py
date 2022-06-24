@@ -1,5 +1,5 @@
 from api.actions import turn_off_and_log_status
-from api.colors import BLACK, DARK_GRAY, GREEN, COLOR_NONE
+from api.colors import BLACK, DARK_GRAY, COLOR_NONE
 
 if __name__ == "__main__":
     turn_off_and_log_status()
