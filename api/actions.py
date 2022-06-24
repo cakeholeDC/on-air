@@ -5,7 +5,7 @@ from api.LightControl import (
     get_device_status,
     list_devices,
     lights_object, 
-    device_name
+    device_id
 )
 from logger import write_log_file
 
@@ -15,18 +15,18 @@ def turn_on_and_log_status():
     '''
     turns on the light and writes the status to the log file.
     '''
-    loop.run_until_complete( lights_on(lights_object, device_name) )
+    loop.run_until_complete( lights_on(lights_object, guid=device_id) )
     write_log_file(True)
 
 def turn_off_and_log_status():
     '''
     turns off the light and writes the status to the log file.
     '''
-    loop.run_until_complete( lights_off(lights_object, device_name) )
+    loop.run_until_complete( lights_off(lights_object, guid=device_id) )
     write_log_file(False)
 
 def get_smartthings_device_list():
     return loop.run_until_complete( list_devices() )
 
 def get_smartthings_device_status(device_name):
-    return loop.run_until_complete( get_device_status(device_name) )
+    return loop.run_until_complete( get_device_status(guid=device_id) )

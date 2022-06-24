@@ -29,7 +29,7 @@ This application utilizes the Samsung Smarttings API to control smart home devic
 5. Set your personal access token as the value of `SMARTTHINGS_TOKEN` in `.env`
 6. Use the API to discover devices:
     - `poetry run python3 get_device_list.py`
-7. Capture your desired device's `Label` from the output and set it as the value of `DEVICE_NAME` in `.env`
+7. Capture your desired device's `ID` from the output and set it as the value of `DEVICE_GUID` in `.env`
 
 ### Configure Applications
 1. Open the application(s) that you want to turn on the light.
