@@ -9,6 +9,7 @@ then
     cp ./scripts/off-air ~
     cp ~/.bash_profile ~/.bash_profile.before_onair # backup for good measure
 
+    # TODO: this script should grab a working directory and echo it to the bash profile scripts
     echo "" >> ~/.bash_profile # newline for clarity
     echo "# Start OnAir Aliases" >> ~/.bash_profile
     echo 'alias onair="~/on-air"' >> ~/.bash_profile
