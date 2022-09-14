@@ -1,4 +1,5 @@
 .env
 .venv/
 light-status.txt
+camera-status.txt
 **__pycache__**
