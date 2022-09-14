@@ -3,10 +3,10 @@ import os
 import psutil
 
 from api.actions import get_smartthings_device_status
-from logger import write_log_file
+from logger import write_light_status
 
 TRIGGER_APPS = json.loads(os.getenv('TRIGGER_APPS'))
-STATUS_LOG = os.getenv('STATUS_LOG')
+LIGHT_STATUS = os.getenv('LIGHT_STATUS')
 
 def discover_process_names():
     for proc in psutil.process_iter():
