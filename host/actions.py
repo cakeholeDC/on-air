@@ -1,7 +1,7 @@
 import json
 import os
-import psutil
 import subprocess
+import psutil
 
 from api.actions import get_smartthings_device_status
 from logger import write_camera_status, write_light_status
@@ -11,28 +11,33 @@ LIGHT_STATUS = os.getenv('LIGHT_STATUS')
 CAMERA_STATUS = os.getenv('CAMERA_STATUS')
 
 def discover_process_names():
+    '''
+    iterates and prints running processes on the host
+    '''
     for proc in psutil.process_iter():
         print(proc.name())
 
-def get_vdc_assistant_power_log():
-    output = subprocess.check_output("./host/get_vdc_assistant_power_log.sh", shell=True)
+def run_vdc_assistant_shell_script():
+    '''
+    reads VDCAssistant_Power_State entries for the last 5 minutes from UDCExtension.PowerLog
+
+    returns "On", "Off", or ""
+    '''
+    # TODO: can we pass n minutes to the script? # pylint: disable=[W0511]
+    output = subprocess.check_output("./host/parse_vdc_assistant_power_log.sh", shell=True)
     return output.decode("utf-8")[:-2]
 
-def check_vdc_power_logs():
-    print("getting VDCAssistant_Power_State from UDCExtension.PowerLog...")
-    return get_vdc_assistant_power_log()
-
-def get_vdc_assistant_power_state():
+def transform_vdc_assistant_power_state():
     '''
-    returns VDCAssistant_Power_State from UDCExtension.PowerLog as a BOOLEAN, or None
-    
+    transforms VDCAssistant_Power_State to BOOLEAN, or None
+
     Allowed Responses: True, False, or None
     '''
-    latest_log_status = check_vdc_power_logs()
+    latest_log_status = run_vdc_assistant_shell_script()
     if len(latest_log_status) > 0:
         return latest_log_status == "On"
-    else:
-        return None
+
+    return None
 
 
 def is_trigger_app_running():
@@ -55,23 +60,24 @@ def is_trigger_app_running():
 
 def get_and_log_vdc_status():
     '''
-    Returns boolean indicating whether the vdc_assistant is active.
+    Takes vdc_assistant_power_state boolean, and checks it against the local status logs to determine
+    whether light should be on, or if the local log status needs to be updated.
 
-    Writes this status to CAMERA_STATUS
+    returns Boolean indicating if VDC Assistant is Active
     '''
 
-    vdc_status = get_vdc_assistant_power_state()
+    vdc_status = transform_vdc_assistant_power_state()
 
     # catch both True and False
-    if vdc_status is not None: # this means the status changed. 
+    if vdc_status is not None: # this means the status changed.
         # write it
         camera_status = vdc_status
         write_camera_status(camera_status)
     else: # this means no log entry in the last 5 minutes, therefore the status didn't change.
-        
+
         # so check if we've logged status before
         vdc_log_exists = os.path.exists(CAMERA_STATUS)
-        
+
         # does the log file exist?
         if vdc_log_exists:
             # if so, read the existing status as camera status

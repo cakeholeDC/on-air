@@ -20,3 +20,4 @@ def write_camera_status(status):
     log_file.write(str(status))
     log_file.write("\n")
     log_file.close()
+    
