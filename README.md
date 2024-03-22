@@ -73,6 +73,28 @@ Sample cron schedules have been provided in the in the `./cronjobs/` directory.
 
 > Need help with cron scheduling? Check out [crontab.guru](https://crontab.guru/)
 
+Invoke:
+```sh
+Options:
+  # the action to perform. Must be "add", "list" or "remove"
+  -a STRING, --action=STRING
+  # run every N minutes. Use 0 for every minute => only for action=add
+  -i INT, --interval-min=INT
+  # starting at hour (24H) => only for action=add
+  -s INT, --start-hour=INT
+  # ending at hour (24H) => only for action=add
+  -e INT, --end-hour=INT
+  # line number to remove => only for action=remove
+  -l INT, --line-num=INT
+```
+`inv manage-cron --action add --interval-min 5 --start-hour 7 --end-hour 4`
+or
+`inv manage-cron -a add -s 7 -e 4 -i 5`
+
+`inv manage-cron --action remove --line-num 3`
+or
+`inv manage-cron -a remove -l 3`
+
 
 ---
 ## Tips & Tricks
