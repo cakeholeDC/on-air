@@ -3,6 +3,7 @@ ON AIR is a python application for turning on a light when a specified applicati
 
 This application utilizes the Samsung Smarttings API to control smart home devices utilizing the Smartthings ecosystem.
 
+![test-and-lint](https://github.com/cakeholeDC/on-air/actions/workflows/test-and-lint.yml/badge.svg)
 <!-- ######### TODO: refactor to use Homekit and shortcuts -->
 <!-- shortcuts run "On Air" -->
 
