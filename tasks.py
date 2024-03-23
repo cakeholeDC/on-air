@@ -21,6 +21,16 @@ def update_dependencies(context):
     """
     context.run("poetry update")
 @task
+def on_air(context):
+    with context.cd(GIT_ROOT):
+        context.run(f"poetry run python on_air.py")
+
+@task
+def off_air(context):
+    with context.cd(GIT_ROOT):
+        context.run(f"poetry run python off_air.py")
+
+@task
 def manage_cron(context, action: str=None, interval_min: int=0, start_hour: int=0, end_hour: int=0, line_num: int=0):
     """
     manages the crontab. Requires an 'action'
