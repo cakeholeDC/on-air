@@ -24,7 +24,7 @@ def run_vdc_assistant_shell_script():
     returns "On", "Off", or ""
     '''
     # TODO: can we pass n minutes to the script? # pylint: disable=[W0511]
-    output = subprocess.check_output("./host/parse_vdc_assistant_power_log.sh", shell=True)
+    output = subprocess.check_output("./scripts/parse_vdc_assistant_power_log.sh", shell=True)
     return output.decode("utf-8")[:-2]
 
 def transform_vdc_assistant_power_state():
