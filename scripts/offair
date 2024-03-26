@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd /Users/kcole/dev/on-air || exit;
+
+./run-off-air.sh

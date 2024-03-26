@@ -3,10 +3,11 @@ import os
 import subprocess
 import psutil
 
-from api.actions import get_smartthings_device_status
-from logger import write_camera_status, write_light_status
+from homekit.control import homekit_device_on, homekit_device_off, homekit_device_state
+from host.management import write_camera_status, write_light_status
 
 TRIGGER_APPS = json.loads(os.getenv('TRIGGER_APPS'))
+# TRIGGER_APPS = []
 LIGHT_STATUS = os.getenv('LIGHT_STATUS')
 CAMERA_STATUS = os.getenv('CAMERA_STATUS')
 
@@ -97,15 +98,30 @@ def get_and_log_device_status():
 
     If LIGHT_STATUS is missing, fetches api.device.status and writes result to LIGHT_STATUS.
     '''
+    # TODO: use pathlib
     log_exists = os.path.exists(LIGHT_STATUS)
 
     if log_exists:
         # read from LIGHT_STATUS
         light_status = open(LIGHT_STATUS, "r").readlines()[0] == "True\n" # pylint: disable=[W1514, R1732]
     else:
-        print("LIGHT_STATUS not present")
-        light_status = get_smartthings_device_status()
+        # get status of homekit device
+        light_status = homekit_device_state()
         # write to LIGHT_STATUS
         write_light_status(light_status)
 
     return light_status
+
+def turn_on_and_log_status():
+    '''
+    turns on the light and writes the status to the log file.
+    '''
+    homekit_device_on()
+    write_light_status(True)
+
+def turn_off_and_log_status():
+    '''
+    turns off the light and writes the status to the log file.
+    '''
+    homekit_device_off()
+    write_light_status(False)
