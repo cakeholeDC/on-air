@@ -1,16 +1,16 @@
 import os
 
 from host.actions import (
-  get_and_log_device_status,
-  get_and_log_vdc_status,
-  is_trigger_app_running,
-  turn_off_and_log_status,
-  turn_on_and_log_status
+    get_and_log_device_status,
+    get_and_log_vdc_status,
+    is_trigger_app_running,
+    turn_off_and_log_status,
+    turn_on_and_log_status,
 )
 
-USE_WEBCAM = (os.getenv('USE_WEBCAM', "False") == "True")
+USE_WEBCAM = os.getenv("USE_WEBCAM", "False") == "True"
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if USE_WEBCAM:
         ## NOTE: This may only work with external usb webcams. Do more testing and research.
         WEBCAM_STATUS = get_and_log_vdc_status()

@@ -1,39 +1,45 @@
 import json
 import os
 import subprocess
+
 import psutil
 
-from homekit.control import homekit_device_on, homekit_device_off, homekit_device_state
+from homekit.control import homekit_device_off, homekit_device_on, homekit_device_state
 from host.management import write_camera_status, write_light_status
 
-TRIGGER_APPS = json.loads(os.getenv('TRIGGER_APPS'))
+TRIGGER_APPS = json.loads(os.getenv("TRIGGER_APPS"))
 # TRIGGER_APPS = []
-LIGHT_STATUS = os.getenv('LIGHT_STATUS')
-CAMERA_STATUS = os.getenv('CAMERA_STATUS')
+LIGHT_STATUS = os.getenv("LIGHT_STATUS")
+CAMERA_STATUS = os.getenv("CAMERA_STATUS")
+
 
 def discover_process_names():
-    '''
+    """
     iterates and prints running processes on the host
-    '''
+    """
     for proc in psutil.process_iter():
         print(proc.name())
 
+
 def run_vdc_assistant_shell_script():
-    '''
+    """
     reads VDCAssistant_Power_State entries for the last 5 minutes from UDCExtension.PowerLog
 
     returns "On", "Off", or ""
-    '''
+    """
     # TODO: can we pass n minutes to the script? # pylint: disable=[W0511]
-    output = subprocess.check_output("./scripts/parse_vdc_assistant_power_log.sh", shell=True)
+    output = subprocess.check_output(
+        "./scripts/parse_vdc_assistant_power_log.sh", shell=True
+    )
     return output.decode("utf-8")[:-2]
 
+
 def transform_vdc_assistant_power_state():
-    '''
+    """
     transforms VDCAssistant_Power_State to BOOLEAN, or None
 
     Allowed Responses: True, False, or None
-    '''
+    """
     latest_log_status = run_vdc_assistant_shell_script()
     if len(latest_log_status) > 0:
         return latest_log_status == "On"
@@ -42,11 +48,11 @@ def transform_vdc_assistant_power_state():
 
 
 def is_trigger_app_running():
-    '''
+    """
     parses running processes and checks if any TRIGGER_APPS are running
 
     returns BOOLEAN
-    '''
+    """
     processes = []
     for proc in psutil.process_iter():
         try:
@@ -59,22 +65,23 @@ def is_trigger_app_running():
     # print("Open Trigger Apps:", processes)
     return len(processes) > 0
 
+
 def get_and_log_vdc_status():
-    '''
+    """
     Takes vdc_assistant_power_state boolean, and checks it against the local status logs to determine
     whether light should be on, or if the local log status needs to be updated.
 
     returns Boolean indicating if VDC Assistant is Active
-    '''
+    """
 
     vdc_status = transform_vdc_assistant_power_state()
 
     # catch both True and False
-    if vdc_status is not None: # this means the status changed.
+    if vdc_status is not None:  # this means the status changed.
         # write it
         camera_status = vdc_status
         write_camera_status(camera_status)
-    else: # this means no log entry in the last 5 minutes, therefore the status didn't change.
+    else:  # this means no log entry in the last 5 minutes, therefore the status didn't change.
 
         # so check if we've logged status before
         vdc_log_exists = os.path.exists(CAMERA_STATUS)
@@ -82,7 +89,9 @@ def get_and_log_vdc_status():
         # does the log file exist?
         if vdc_log_exists:
             # if so, read the existing status as camera status
-            camera_status = open(CAMERA_STATUS, "r").readlines()[0] == "True\n" # pylint: disable=[W1514, R1732]
+            camera_status = (
+                open(CAMERA_STATUS, "r").readlines()[0] == "True\n"
+            )  # pylint: disable=[W1514, R1732]
         else:
             # if not, write the log assuming the camera is off and wait for PowerOn event
             camera_status = False
@@ -90,20 +99,23 @@ def get_and_log_vdc_status():
 
     return camera_status
 
+
 def get_and_log_device_status():
-    '''
+    """
     returns BOOLEAN
 
     Parses LIGHT_STATUS for device status.
 
     If LIGHT_STATUS is missing, fetches api.device.status and writes result to LIGHT_STATUS.
-    '''
+    """
     # TODO: use pathlib
     log_exists = os.path.exists(LIGHT_STATUS)
 
     if log_exists:
         # read from LIGHT_STATUS
-        light_status = open(LIGHT_STATUS, "r").readlines()[0] == "True\n" # pylint: disable=[W1514, R1732]
+        light_status = (
+            open(LIGHT_STATUS, "r").readlines()[0] == "True\n"
+        )  # pylint: disable=[W1514, R1732]
     else:
         # get status of homekit device
         light_status = homekit_device_state()
@@ -112,16 +124,18 @@ def get_and_log_device_status():
 
     return light_status
 
+
 def turn_on_and_log_status():
-    '''
+    """
     turns on the light and writes the status to the log file.
-    '''
+    """
     homekit_device_on()
     write_light_status(True)
 
+
 def turn_off_and_log_status():
-    '''
+    """
     turns off the light and writes the status to the log file.
-    '''
+    """
     homekit_device_off()
     write_light_status(False)
