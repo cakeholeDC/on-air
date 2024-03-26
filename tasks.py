@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from invoke import task
+from invoke import task  # pylint: disable=E0401
 
 GIT_ROOT = Path(__file__).resolve().parent
 LIGHT_STATUS = os.getenv("LIGHT_STATUS")
@@ -35,7 +35,7 @@ def deploy_scripts(context):
     """
     onair_sh = Path.home() / "onair"
     # onair_sh = GIT_ROOT / "scripts" / "onair"
-    with open(onair_sh, "w") as on_file:
+    with open(onair_sh, "w", encoding="utf-8") as on_file:
         onair_content = [
             "#!/bin/bash\n\n",
             f"cd {GIT_ROOT} || exit;\n\n",
@@ -47,7 +47,7 @@ def deploy_scripts(context):
 
     offair_sh = Path.home() / "offair"
     # offair_sh = GIT_ROOT / "scripts" / "offair"
-    with open(offair_sh, "w") as off_file:
+    with open(offair_sh, "w", encoding="utf-8") as off_file:
         offair_content = [
             "#!/bin/bash\n\n",
             f"cd {GIT_ROOT} || exit;\n\n",
@@ -118,6 +118,7 @@ def manage_cron(
     end_hour: int = 0,
     line_num: int = 0,
 ):
+    # pylint: disable=[R0913,R0912,R1705]
     """
     manages the crontab. Requires an 'action'
     """

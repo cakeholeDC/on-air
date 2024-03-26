@@ -67,6 +67,7 @@ def is_trigger_app_running():
 
 
 def get_and_log_vdc_status():
+    # pylint: disable=[R1732]
     """
     Takes vdc_assistant_power_state boolean, and checks it against the local status logs to determine
     whether light should be on, or if the local log status needs to be updated.
@@ -90,8 +91,8 @@ def get_and_log_vdc_status():
         if vdc_log_exists:
             # if so, read the existing status as camera status
             camera_status = (
-                open(CAMERA_STATUS, "r").readlines()[0] == "True\n"
-            )  # pylint: disable=[W1514, R1732]
+                open(CAMERA_STATUS, "r", encoding="utf-8").readlines()[0] == "True\n"
+            )
         else:
             # if not, write the log assuming the camera is off and wait for PowerOn event
             camera_status = False
@@ -101,6 +102,7 @@ def get_and_log_vdc_status():
 
 
 def get_and_log_device_status():
+    # pylint: disable=[R1732]
     """
     returns BOOLEAN
 
@@ -114,8 +116,8 @@ def get_and_log_device_status():
     if log_exists:
         # read from LIGHT_STATUS
         light_status = (
-            open(LIGHT_STATUS, "r").readlines()[0] == "True\n"
-        )  # pylint: disable=[W1514, R1732]
+            open(LIGHT_STATUS, "r", encoding="utf-8").readlines()[0] == "True\n"
+        )
     else:
         # get status of homekit device
         light_status = homekit_device_state()
