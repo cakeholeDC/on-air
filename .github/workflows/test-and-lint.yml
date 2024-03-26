@@ -26,35 +26,35 @@ jobs:
       #----------------------------------------------
       - name: ⤵️ Check out repository
         uses: actions/checkout@v3
-      # #----------------------------------------------
-      # # Set-up python
-      # #----------------------------------------------
-      # - name: 🐍 Setup up python 3.11
-      #   run: sudo apt-get install python3
-      # #----------------------------------------------
-      # # Install & configure poetry
-      # #----------------------------------------------
-      # - name: 📖 Install Poetry
-      #   uses: snok/install-poetry@v1
-      #   with:
-      #     virtualenvs-create: true
-      #     virtualenvs-in-project: true
-      # #----------------------------------------------
-      # # Load cached venv if cache exists
-      # #----------------------------------------------
-      # - name: 🤑 Load cached venv
-      #   id: cached-poetry-dependencies
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: .venv
-      #     key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
-      # #----------------------------------------------
-      # # Install dependencies if cache does not exist
-      # #----------------------------------------------
-      # - name: 📦 Install Packages
-      #   if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-      #   # run: poetry install --no-interaction --no-root --with test
-      #   run: poetry install --no-interaction --no-root
+      #----------------------------------------------
+      # Set-up python
+      #----------------------------------------------
+      - name: 🐍 Setup up python 3.11
+        run: sudo apt-get install python3
+      #----------------------------------------------
+      # Install & configure poetry
+      #----------------------------------------------
+      - name: 📖 Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+      #----------------------------------------------
+      # Load cached venv if cache exists
+      #----------------------------------------------
+      - name: 🤑 Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+      #----------------------------------------------
+      # Install dependencies if cache does not exist
+      #----------------------------------------------
+      - name: 📦 Install Packages
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        # run: poetry install --no-interaction --no-root --with test
+        run: poetry install --no-interaction --no-root
 
       # #----------------------------------------------
       # # Invoke pytest, via poetry
@@ -64,12 +64,12 @@ jobs:
       #     # python3 -m pip install tomli
       #     poetry run pytest tests/
       
-      # #----------------------------------------------
-      # # Invoke 'pylint', via poetry
-      # #----------------------------------------------
-      # - name: 🐍 Run pylint
-      #   run: |
-      #     poetry run pylint *.py */*.py
+      #----------------------------------------------
+      # Invoke 'pylint', via poetry
+      #----------------------------------------------
+      - name: 🐍 Run pylint
+        run: |
+          poetry run pylint *.py */*.py
 
       #----------------------------------------------
       # Invoke 'shellcheck'
