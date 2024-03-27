@@ -152,16 +152,17 @@ def manage_cron(
                     cron_min = f"*/{interval_min}"
                 # run the script
                 # TODO: update the cronjob.
-                # context.run(f"./cron-mgmt.sh add '{cron_min} {cron_hours} * * 1-5 {GIT_ROOT}/run-app-status-light.sh > /dev/null 2>&1'")
                 context.run(
-                    f"./cron-mgmt.sh add '{cron_min} {cron_hours} * * 1-5 {GIT_ROOT}/run-app-status-light.sh'"
+                    f"./cron-mgmt.sh add '{cron_min} {cron_hours} * * 1-5 {GIT_ROOT}/run-app-status-light.sh > /dev/null 2>&1'"
                 )
-                context.run("echo '🎙️🚨 on-air entry written to crontab.'")
+                context.run("echo '🎙️ on-air entry written to crontab.'")
         elif action == "list":
             context.run("./cron-mgmt.sh list")
         elif action == "remove":
             if not line_num:
-                context.run("echo 'must provide line-num with --action remove'")
+                context.run(
+                    "echo '❌ Error: Must provide line-num with --action remove'"
+                )
             else:
                 context.run(f"./cron-mgmt.sh remove {line_num}")
                 context.run(f"echo '✅ line {line_num} removed from crontab.'")
