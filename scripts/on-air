@@ -1,5 +1,0 @@
-#!/bin/bash
-
-cd ~/dev/on-air || exit;
-
-./run-on-air.sh
