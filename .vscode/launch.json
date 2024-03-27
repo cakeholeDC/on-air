@@ -11,3 +11,5 @@
             "program": "${file}",
             "console": "integratedTerminal"
         }
+    ]
+}
