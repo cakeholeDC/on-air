@@ -4,7 +4,8 @@ import subprocess
 
 import psutil
 
-from homekit.control import homekit_device_off, homekit_device_on, homekit_device_state
+# from homekit.control import homekit_device_off, homekit_device_on, homekit_device_state
+from homekit.control import homekit_device_state
 from host.management import write_camera_status, write_light_status
 
 TRIGGER_APPS = json.loads(os.getenv("TRIGGER_APPS"))
@@ -131,7 +132,7 @@ def turn_on_and_log_status():
     """
     turns on the light and writes the status to the log file.
     """
-    homekit_device_on()
+    # homekit_device_on()
     write_light_status(True)
 
 
@@ -139,5 +140,5 @@ def turn_off_and_log_status():
     """
     turns off the light and writes the status to the log file.
     """
-    homekit_device_off()
+    # homekit_device_off()
     write_light_status(False)

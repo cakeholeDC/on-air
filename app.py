@@ -34,11 +34,13 @@ if __name__ == "__main__":
     # light should be on, but is off
     elif (WEBCAM_STATUS or APP_STATUS) and not DEVICE_STATUS:
         # turn light on
+        os.system("shortcuts run 'onair'")
         turn_on_and_log_status()
 
     # light should be off, but is on
     elif (not WEBCAM_STATUS and not APP_STATUS) and DEVICE_STATUS:
         # turn light off
+        os.system("shortcuts run 'offair'")
         turn_off_and_log_status()
 
     # light should be off, and is off
