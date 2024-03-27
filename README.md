@@ -43,48 +43,38 @@ Open the Shortcuts app and create two new shortcuts. One named "On Air" and one 
 ### Configure Environment
 <!-- TODO: update with invoke -->
 1. Create local environment
-    - `poetry install`
-2. Create your `.env` file
+    - `inv install-dependencies`
+1. Create your `.env` file
     - `cp .env.example .env`
-3. Open `.env` in your preferred code editor.
-<!-- TODO: remove -->
-4. Obtain a [smartthings personal access token](https://account.smartthings.com/tokens) fom the Smartthings developer hub.
-<!-- TODO: remove -->
-5. Set your personal access token as the value of `SMARTTHINGS_TOKEN` in `.env`
-<!-- TODO: remove -->
-6. Use the API to discover devices:
-    - `poetry run python3 get_device_list.py`
-    <!-- TODO: remove -->
-7. Capture your desired device's `ID` from the output and set it as the value of `DEVICE_GUID` in `.env`
+1. Open `.env` in your preferred code editor.
+1. run `inv deploy-scripts` to write the scripts to your home dir
+1. run `inv TODO` to create your bash aliases.
 
 ### Configure Applications
-<!-- TODO: Update -->
 1. Open the application(s) that you want to turn on the light.
-2. Run the following command to find the application's proces name. 
+1. Run the following command to find the application's proces name. 
     - Replace _{app-name}_ with the application name.
-    <!-- TODO: update with invoke -->
-    - `poetry run python3 get_process_name.py | grep {app-name}`
+    - `inv discover-process-names -q {app-name}`
     > **Note:** when searching for **_app-name_**, try using a short keyword like _"code"_ rather than _"Visual Studio Code"_
     > 
     > Sometimes, a process name is shortened to _"vscode"_ which would not show up with a multi word query.
     >
     > If you still cannot find your process name, run this command without adding ` | grep {app-name}` to see all processes. 
-3. Find the process name in the output.
-4. Copy & Paste the application name(s) into `TRIGGER_APPS` in `.env`
+1. Find the process name in the output.
+1. Copy & Paste the application name(s) into `TRIGGER_APPS` in `.env`
 
-### Testing the Configuration
+<!-- ### Testing the Configuration
 <!-- TODO: update -->
-Follow these steps to test your configiuration:
+<!-- Follow these steps to test your configiuration:
 1. run `./run-on-air.sh` — the light should turn on.
 2. run `./run-off-air.sh` — the light should turn off.
 3. Open the trigger application(s) 
     - run `./run-app-status-light.sh` — the light should turn on. 
 4. Quit the trigger application(s)
-    - run `./run-app-status-light.sh` — the light should turn off.
+    - run `./run-app-status-light.sh` — the light should turn off. -->
 
 ---
 ## Automation
-<!-- TODO: update -->
 To automate your ON AIR light, schedule a cron job to run the script `./run-app-status-light.sh`
 
 Sample cron schedules have been provided in the in the `./cronjobs/` directory.
@@ -93,14 +83,10 @@ Sample cron schedules have been provided in the in the `./cronjobs/` directory.
 
 
 ### Adding a cron job
-<!-- TODO: update -->
-1. Open crontab list with `crontab -e`
-2. Add your cron schedule to the crontab list
-3. Save and Exit vim with `:wq`
+#### Scheduler (Recommended)
+Use the builtin scheduler to write your crontab entry:
 
-> Need help with cron scheduling? Check out [crontab.guru](https://crontab.guru/)
-
-Invoke:
+Run `inv manage-cron` to setup your crontab entry. The scheduler accepts the options below:
 ```sh
 Options:
   # the action to perform. Must be "add", "list" or "remove"
@@ -114,14 +100,18 @@ Options:
   # line number to remove => only for action=remove
   -l INT, --line-num=INT
 ```
-`inv manage-cron --action add --interval-min 5 --start-hour 7 --end-hour 4`
-or
-`inv manage-cron -a add -s 7 -e 4 -i 5`
 
-`inv manage-cron --action remove --line-num 3`
-or
-`inv manage-cron -a remove -l 3`
+Examples:
+- `inv manage-cron --action add --interval-min 5 --start-hour 7 --end-hour 15`
+- `inv manage-cron --action remove --line-num 3`
+- `inv manage-cron --action list`
 
+#### Manually (Legacy)
+1. Open crontab list with `crontab -e`
+2. Add your cron schedule to the crontab list
+3. Save and Exit vim with `:wq`
+
+> Need help with cron scheduling? Check out [crontab.guru](https://crontab.guru/)
 
 ---
 ## Tips & Tricks
