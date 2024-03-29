@@ -55,16 +55,16 @@ Open the Shortcuts app and create two new shortcuts. One named "On Air" and one 
 ### Configuration
 The application is configured via the `.env` file.
 
-| Variable     | Type       | Usage      |
-| ------------ | ---------- | ---------- |
-| TRIGGER_APPS | List       | [Process name(s)](#trigger-apps) to trigger the indicator light |
-| USE_WEBCAM   | Boolean    | Enable trigger for webcam activation | 
+| Variable     | Type        | Usage      |
+| ------------ | ----------- | ---------- |
+| TRIGGER_APPS | List ["str"]| [Process name(s)](#trigger-apps) to trigger the indicator light |
+| USE_WEBCAM   | Boolean     | Enable trigger for webcam activation | 
 <!-- TODO: implement audio trigger -->
-<!-- | USE_AUDIO    | Boolean    | Enable trigger for microphone activation |  -->
+<!-- | USE_AUDIO    | Boolean     | Enable trigger for microphone activation |  -->
 
 #### Trigger Apps
 1. Open the application(s) that you want to turn on the light.
-1. Run the following command to find the application's proces name. 
+1. Run the following command to find the application's process name. 
     - `inv discover-process-names -q {app-name}`
 1. Find the process name in the output.
 
@@ -72,7 +72,7 @@ The application is configured via the `.env` file.
 > 
 > Sometimes, a process name is shortened to _"vscode"_ which would not show up with a multi word query.
 >
-> If you still cannot find your process, run this command without adding `-q {app-name}` to see all running processes. 
+> If you are unable to successfully query for the process, run the command without `-q {app-name}` to view *all* running processes. 
 
 ### Manual Usage
 A cool party trick is being able to turn the light on or off from the command line. After running the install steps, you can manually control the light with the `onair` and `offair` commands. These commands do not override the cron process.
@@ -119,3 +119,6 @@ Sample cron schedules have been provided in the in the `./cronjobs/` directory.
 ## Uninstall
 1. Remove convenience scripts, bash aliases, and python venv
     - `inv uninstall`
+1. Remove the crontab entry, if applicable
+    - `inv manage-cron --action list`
+    - `inv manage-cron --action remove --line-num {N}`
