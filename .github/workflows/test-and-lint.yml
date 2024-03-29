@@ -67,7 +67,7 @@ jobs:
       #----------------------------------------------
       # Invoke 'pylint', via poetry
       #----------------------------------------------
-      - name: 🐍 Run pylint
+      - name: 🧹 Run pylint
         run: |
           poetry run pylint *.py */*.py
 

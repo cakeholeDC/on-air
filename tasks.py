@@ -10,11 +10,11 @@ BASH_PROFILE = Path.home() / ".bash_profile"
 START_ONAIR_BLOCK = "### START ON AIR ###"
 END_ONAIR_BLOCK = "### END ON AIR ###"
 
-print_ln = "-------------------"
+PRINT_LN = "-------------------"
 
 
 def ensure_dot_env(context):
-    print(print_ln)
+    print(PRINT_LN)
     print("👀 Checking '.env'...")
 
     if ENV_FILE.exists():
@@ -23,7 +23,7 @@ def ensure_dot_env(context):
         print("✨ Creating '.env'...")
         context.run(f"cp {GIT_ROOT / '.env.example'} {ENV_FILE}")
         print("✅ '.env' created!")
-    print(print_ln)
+    print(PRINT_LN)
 
 
 @task
@@ -33,12 +33,12 @@ def say_hello(context):
 
 @task
 def install(context):
-    print(print_ln)
+    print(PRINT_LN)
     print("💾 Installing ON AIR...")
     deploy_scripts(context)
     write_bash_aliases(context)
     print("✅ ON AIR installed successfully!")
-    print(print_ln)
+    print(PRINT_LN)
 
 
 @task
@@ -54,7 +54,7 @@ def uninstall(context):
         else:
             break
 
-    print(f"\n{print_ln}")
+    print(f"\n{PRINT_LN}")
     if first_letter_lowercase == "y":
         print("🗑️  Uninstalling ON AIR...")
         # remove scripts
@@ -68,7 +68,7 @@ def uninstall(context):
         print("🔥 ON AIR uninstalled successfully!")
     if first_letter_lowercase == "n":
         print("❌ Uninstall cancelled.")
-    print(print_ln)
+    print(PRINT_LN)
 
 
 @task
@@ -76,9 +76,9 @@ def write_bash_aliases(context):
     """
     Writes onair/offair bash aliases
     """
-    print(print_ln)
+    print(PRINT_LN)
     print(f"👀 Checking '{BASH_PROFILE}' for project aliases...")
-    with open(BASH_PROFILE, "r") as profile:
+    with open(BASH_PROFILE, "r", encoding="utf-8") as profile:
         content = profile.read()
         if START_ONAIR_BLOCK in content:
             print("⏭️  Project aliases already exist, skipping.")
@@ -94,7 +94,7 @@ alias offair="$HOME/offair"
 EOT"""
             )
             print(f"✅ Project aliases written to '{BASH_PROFILE}' successfully!")
-    print(print_ln)
+    print(PRINT_LN)
 
 
 @task
@@ -120,7 +120,7 @@ def deploy_scripts(context):
     """
     Deploys onair/offair scripts at the user's home dir.
     """
-    print(print_ln)
+    print(PRINT_LN)
     print(f"👀 Checking '{ Path.home() }' for convenence scripts...")
     if not ONAIR_SH.exists() and not OFFAIR_SH.exists():
         print("📜 Writing convenence scripts...")
