@@ -1,14 +1,20 @@
 # ON AIR 🎙️🚨
-ON AIR is a python application for turning on a light to signal to my family that I am currently on a video call. 
+![test-and-lint](https://github.com/cakeholeDC/on-air/actions/workflows/test-and-lint.yml/badge.svg)
 
-The applicaton is configured to respond when a specified application(s) is running. It can also be configured to respond when Apple's `VDC_Assistant` (the little light next to the webcam) is activated.
+ON AIR is an application for turning on a light to signal to my family that I am currently on a video call. 
+
+This app deploys a script that runs as a cronjob and determines whether the indicator light should be ON or OFF, and then sends a signal to the controller for the device.
+
+The applicaton can be configured to respond to two triggers: <!-- TODO: two => three -->
+1. When a specified application(s) is running.
+1. When Apple's `VDC_Assistant` (the little light next to the webcam) is activated. <!-- TODO: VDC_Assistant is external webcams only. Need to fix this. -->
+<!-- TODO: implement audio trigger -->
+<!-- 1. When Apples `IOAudioEngineState` is equal to 1 (true / enabled).  -->
 
 This application utilizes _Apple HomeKit_ and _Apple Shortcuts_ to control the device.
 
-![test-and-lint](https://github.com/cakeholeDC/on-air/actions/workflows/test-and-lint.yml/badge.svg)
-<!-- ######### TODO: refactor to use Homekit and shortcuts -->
-<!-- shortcuts run "On Air" -->
-
+<!-- TODO: If you're interested in using Smartthings to control your device, see the branch `smartthings` -->
+<!-- TODO: If you're interested in using HomeAssistant to control your device, see the branch `hass` -->
 
 ## Pre-Requesites 
 -  macOS Ventura 13.3+
@@ -40,53 +46,45 @@ Open the Shortcuts app and create two new shortcuts. One named "On Air" and one 
 1. Click **Done**
 1. **Name the shortcut** and click **Done**
 
-### Configure Environment
-<!-- TODO: update with invoke -->
-1. Create local environment
-    - `inv install-dependencies`
-1. Create your `.env` file
-    - `cp .env.example .env`
-1. Open `.env` in your preferred code editor.
-1. run `inv deploy-scripts` to write the scripts to your home dir
-1. run `inv TODO` to create your bash aliases.
+### Install
+1. Install project dependencies and create .env
+    - `inv install-dependencies` <!-- TODO: rename to setup project or something like that. -->
+1. Write convenience scripts and bash aliases
+    - `inv install`
 
-### Configure Applications
+### Configuration
+The application is configured via the `.env` file.
+
+| Variable     | Type       | Usage      |
+| ------------ | ---------- | ---------- |
+| TRIGGER_APPS | List       | [Process name(s)](#trigger-apps) to trigger the indicator light |
+| USE_WEBCAM   | Boolean    | Enable trigger for webcam activation | 
+<!-- TODO: implement audio trigger -->
+<!-- | USE_AUDIO    | Boolean    | Enable trigger for microphone activation |  -->
+
+#### Trigger Apps
 1. Open the application(s) that you want to turn on the light.
 1. Run the following command to find the application's proces name. 
-    - Replace _{app-name}_ with the application name.
     - `inv discover-process-names -q {app-name}`
-    > **Note:** when searching for **_app-name_**, try using a short keyword like _"code"_ rather than _"Visual Studio Code"_
-    > 
-    > Sometimes, a process name is shortened to _"vscode"_ which would not show up with a multi word query.
-    >
-    > If you still cannot find your process name, run this command without adding ` | grep {app-name}` to see all processes. 
 1. Find the process name in the output.
-1. Copy & Paste the application name(s) into `TRIGGER_APPS` in `.env`
 
-<!-- ### Testing the Configuration
-<!-- TODO: update -->
-<!-- Follow these steps to test your configiuration:
-1. run `./run-on-air.sh` — the light should turn on.
-2. run `./run-off-air.sh` — the light should turn off.
-3. Open the trigger application(s) 
-    - run `./run-app-status-light.sh` — the light should turn on. 
-4. Quit the trigger application(s)
-    - run `./run-app-status-light.sh` — the light should turn off. -->
+> **Note:** when searching for **_app-name_**, try using a short keyword like _"code"_ rather than _"Visual Studio Code"_
+> 
+> Sometimes, a process name is shortened to _"vscode"_ which would not show up with a multi word query.
+>
+> If you still cannot find your process, run this command without adding `-q {app-name}` to see all running processes. 
 
----
-## Automation
+### Manual Usage
+A cool party trick is being able to turn the light on or off from the command line. After running the install steps, you can manually control the light with the `onair` and `offair` commands. These commands do not override the cron process.
+
+### Automation
 To automate your ON AIR light, schedule a cron job to run the script `./run-app-status-light.sh`
 
-Sample cron schedules have been provided in the in the `./cronjobs/` directory.
-- Every 5th Minute, MON-FRI 9am-5pm
-- Every Minute, Every Day
+#### Cron Scheduler (Recommended)
+Use the builtin scheduler to write your crontab entry.
+- `inv manage-cron [options]`
 
-
-### Adding a cron job
-#### Scheduler (Recommended)
-Use the builtin scheduler to write your crontab entry:
-
-Run `inv manage-cron` to setup your crontab entry. The scheduler accepts the options below:
+The scheduler accepts the options below:
 ```sh
 Options:
   # the action to perform. Must be "add", "list" or "remove"
@@ -111,13 +109,13 @@ Examples:
 2. Add your cron schedule to the crontab list
 3. Save and Exit vim with `:wq`
 
+Sample cron schedules have been provided in the in the `./cronjobs/` directory.
+- Every 5th Minute, MON-FRI 9am-5pm
+- Every Minute, Every Day
+
 > Need help with cron scheduling? Check out [crontab.guru](https://crontab.guru/)
 
----
-## Tips & Tricks
-### Terminal Aliases
-<!-- TODO: update with invoke -->
-A cool party trick is being able to turn the light on or off from the command line. This can be accomplished by adding aliases to your `$PATH` that run the on/off scripts.
 
-<!-- TODO: make this invoke -->
-Run `./scripts/deploy_terminal_alias` to quickly configure your `$PATH` with `onair` and `offair` aliases for controlling the light. 
+## Uninstall
+1. Remove convenience scripts, bash aliases, and python venv
+    - `inv uninstall`
