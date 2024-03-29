@@ -39,3 +39,23 @@ repos:
         name: isort (python)
         language_version: '3.11'
         args: ["--profile", "black", "--filter-files"]
+-   repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: pylint
+        language: system
+        types: [python]
+        args:
+          [
+            "-rn", # Only display messages
+            # "-sn", # Don't display the score
+          ]
+# -   repo: https://github.com/pylint-dev/pylint
+#     rev: v3.1.0
+#     hooks:
+#     -   id: pylint
+#         args:
+#         - --max-line-length=80
+#         - --ignore-imports=yes
+#         - -d duplicate-code
