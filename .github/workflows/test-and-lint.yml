@@ -74,7 +74,6 @@ jobs:
       #----------------------------------------------
       # Invoke 'shellcheck'
       #----------------------------------------------
-      - uses: actions/checkout@v2
       - name: 🦪 Run shellcheck
         uses: sudo-bot/action-shellcheck@latest
         with:
