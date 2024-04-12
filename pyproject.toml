@@ -2,16 +2,19 @@
 name = "on-air"
 version = "0.1.0"
 description = ""
-authors = ["Kyle Cole <54221202+cakeholeDC@users.noreply.github.com>"]
+authors = ["Kyle Cole <cakeholeDC@users.noreply.github.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.7.2"
+python = "^3.11"
 python-dotenv = "^0.19.2"
 psutil = "^5.9.8"
 
-[tool.poetry.dev-dependencies]
-pytest = "^6.2.5"
-pylint = "^2.14.3"
+[tool.poetry.group.test.dependencies]
+pytest = "^8.1.1"
+
+
+[tool.poetry.group.dev.dependencies]
+pylint = "^3.1.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

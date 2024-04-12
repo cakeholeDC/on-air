@@ -5,11 +5,12 @@ ON AIR is an application for turning on a light to signal to my family that I am
 
 This app deploys a script that runs as a cronjob and determines whether the indicator light should be ON or OFF, and then sends a signal to the controller for the device.
 
-The applicaton can be configured to respond to two triggers: <!-- TODO: two => three -->
+The applicaton can be configured to respond to three triggers:
 1. When a specified application(s) is running.
-1. When Apple's `VDC_Assistant` (the little light next to the webcam) is activated. <!-- TODO: VDC_Assistant is external webcams only. Need to fix this. -->
-<!-- TODO: implement audio trigger -->
-<!-- 1. When Apples `IOAudioEngineState` is equal to 1 (true / enabled).  -->
+1. When the webcam is active. Webcam activity is determined by:
+    - Apple's `VDC_Assistant` (a USB webcam) is activated.
+    - Apple's `AppleH13CamIn::setGetPowerStateGated` (the onboard camera) is changed.
+1. When Apples `IOAudioEngineState` is equal to 1 (true / enabled). 
 
 This application utilizes _Apple HomeKit_ and _Apple Shortcuts_ to control the device.
 
@@ -35,8 +36,7 @@ This application utilizes _Apple HomeKit_ and _Apple Shortcuts_ to control the d
 ### Create Apple Shortcuts
 Shortcuts can be created on macOS or iOS. 
 
-Open the Shortcuts app and create two new shortcuts. One named "On Air" and one named "Off Air"
-<!-- TODO: new shortcut for status, and poll that instead of a logfile. -->
+Open the Shortcuts app and create two new shortcuts. One to turn on your device, and one to turn it off. 
 
 1. For the action, select the **Home App**
 1. From the list of actions, select **Control**
@@ -45,6 +45,8 @@ Open the Shortcuts app and create two new shortcuts. One named "On Air" and one 
 1. Select your **device's state**
 1. Click **Done**
 1. **Name the shortcut** and click **Done**
+
+Later, you'll add the names of these shortcuts to `.env` as `SHORTCUT_ON` and `SHORTCUT_OFF`.
 
 ### Install
 1. Install project dependencies and create .env
@@ -55,12 +57,17 @@ Open the Shortcuts app and create two new shortcuts. One named "On Air" and one 
 ### Configuration
 The application is configured via the `.env` file.
 
-| Variable     | Type        | Usage      |
-| ------------ | ----------- | ---------- |
-| TRIGGER_APPS | List ["str"]| [Process name(s)](#trigger-apps) to trigger the indicator light |
-| USE_WEBCAM   | Boolean     | Enable trigger for webcam activation | 
-<!-- TODO: implement audio trigger -->
-<!-- | USE_AUDIO    | Boolean     | Enable trigger for microphone activation |  -->
+| Variable       | Type        | Usage      |
+| -------------- | ----------- | ---------- |
+| TRIGGER_APPS   | List ["str"]| [Process name(s)](#trigger-apps) to trigger the device |
+| ENABLE_VIDEO   | Boolean     | Enable trigger for webcam activation | 
+| ENABLE_AUDIO   | Boolean     | Enable trigger for microphone activation | 
+| DEVICE_CACHE   | String      | device cache filename |
+| VIDEO_CACHE    | String      | video cache filename |
+| SHORTCUT_ON    | String      | name of Homekit shortut for device on |
+| SHORTCUT_OFF   | String      | name of Homekit shortut for device off |
+<!-- TODO: new shortcut for status, and poll that instead of a logfile. -->
+<!-- | SHORTCUT_STATE | String      | name of Homekit shortut for device state | -->
 
 #### Trigger Apps
 1. Open the application(s) that you want to turn on the light.

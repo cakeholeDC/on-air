@@ -1,27 +1,41 @@
-import os
+import subprocess
 
-SHORTCUT_ON = os.getenv("SHORTCUT_ON")
-SHORTCUT_OFF = os.getenv("SHORTCUT_OFF")
-SHORTCUT_STATE = os.getenv("SHORTCUT_STATE")
+from config import CONFIG
+from host.logger import logger
 
 
 # TODO: run shortcut.
-def homekit_device_on():
+def homekit_device_on() -> None:
+    """
+    Runs an Apple shortcut to turn on the Homekit Device
+    """
+    logger.debug("🏡 homekit device on")
     # Run the apple shortcut to turn the device on
-    os.system(f"shortcuts run '{SHORTCUT_ON}'")
+    subprocess.run(
+        args=["/usr/bin/shortcuts", "run", CONFIG["SHORTCUT_ON"]], check=False
+    )
 
 
-def homekit_device_off():
+def homekit_device_off() -> None:
+    """
+    Runs an Apple shortcut to turn off the Homekit Device
+    """
+    logger.debug("🏡 homekit device off")
     # Run the apple shortcut to turn the device off
-    os.system(f"shortcuts run '{SHORTCUT_OFF}'")
+    subprocess.run(
+        args=["/usr/bin/shortcuts", "run", CONFIG["SHORTCUT_OFF"]], check=False
+    )
 
 
-def homekit_device_state():
+def homekit_device_state() -> bool:
+    """
+    Runs an Apple shortcut to get the current state of the Homekit Device
+    """
     # Run the apple shortcut to get the device's state
-    status = os.system(f"shortcuts run '{SHORTCUT_STATE}'")
-    print(f"homekit_device_state = {(status == 1)}")
-    return status == 1
-
-
-if __name__ == "__main__":
-    homekit_device_state()
+    status = subprocess.run(
+        args=["/usr/bin/shortcuts", "run", CONFIG["SHORTCUT_STATE"]],
+        capture_output=True,
+        check=False,
+    ).stdout.decode()
+    logger.debug(f"🏡 homekit device {status=}")  # pylint: disable=W1203
+    return status == "Yes"
