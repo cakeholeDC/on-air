@@ -30,7 +30,8 @@ jobs:
       # Set-up python
       #----------------------------------------------
       - name: 🐍 Setup up python 3.11
-        run: sudo apt-get install python3
+        # run: sudo apt-get install python3.11
+        uses: actions/setup-python@v3
       #----------------------------------------------
       # Install & configure poetry
       #----------------------------------------------
@@ -52,17 +53,17 @@ jobs:
       # Install dependencies if cache does not exist
       #----------------------------------------------
       - name: 📦 Install Packages
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        # run: poetry install --no-interaction --no-root --with test
-        run: poetry install --no-interaction --no-root
+        # if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root --with test --with dev
+        # run: poetry install --no-interaction --no-root
 
-      # #----------------------------------------------
-      # # Invoke pytest, via poetry
-      # #----------------------------------------------
-      # - name: 🧪 Run tests
-      #   run: |
-      #     # python3 -m pip install tomli
-      #     poetry run pytest tests/
+      #----------------------------------------------
+      # Invoke pytest, via poetry
+      #----------------------------------------------
+      - name: 🧪 Run tests
+        run: |
+          # python3 -m pip install tomli
+          poetry run pytest .
       
       #----------------------------------------------
       # Invoke 'pylint', via poetry
