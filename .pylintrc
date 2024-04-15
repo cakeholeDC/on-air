@@ -10,3 +10,8 @@
 # multiple time (only on the command line, not in the configuration file where
 # it should appear only once).
 disable=C0114, C0115, C0116, C0301, W0511
+
+# Sets pythonpath for CI
+# https://stackoverflow.com/a/66767754
+[MASTER]
+init-hook='import sys; sys.path.append(".")'
