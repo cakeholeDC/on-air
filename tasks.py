@@ -13,38 +13,30 @@ END_ONAIR_BLOCK = "### END ON AIR ###"
 PRINT_LN = "-------------------"
 
 
-def ensure_dot_env(context):
-    print(PRINT_LN)
-    print("👀 Checking '.env'...")
-
-    if ENV_FILE.exists():
-        print("⏭️  '.env' already exists, skipping.")
-    else:
-        print("✨ Creating '.env'...")
-        context.run(f"cp {GIT_ROOT / '.env.example'} {ENV_FILE}")
-        print("✅ '.env' created!")
-    print(PRINT_LN)
+# @task
+# def say_hello(context):
+#     context.run("echo 'Welcome to on-air!'")
 
 
 @task
-def say_hello(context):
-    context.run("echo 'Hello World!'")
-
-
-@task
-def install(context):
+def app_install(context):
+    """
+    Installs application scripts and shortcuts.
+    """
     print(PRINT_LN)
     print("💾 Installing ON AIR...")
-    deploy_scripts(context)
-    write_bash_aliases(context)
+    app_scripts_deploy(context)
+    app_bash_aliases(context)
     print("✅ ON AIR installed successfully!")
+    print(PRINT_LN)
+    print("🌽 Don't forget to add your cronjob!")
     print(PRINT_LN)
 
 
 @task
-def uninstall(context):
+def app_uninstall(context):
     """
-    Removes all scripts, bash aliases, and virtrual environments
+    Removes application scripts and shortcuts.
     """
     while True:
         confirm = input("🎙️ 🚨 Are you sure you wish to uninstall ON AIR? (y/n) ")
@@ -66,13 +58,30 @@ def uninstall(context):
         )
         # clean up python etc.
         print("🔥 ON AIR uninstalled successfully!")
+        print(PRINT_LN)
+        print("🌽 Don't forget to remove your cronjob!")
     if first_letter_lowercase == "n":
         print("❌ Uninstall cancelled.")
     print(PRINT_LN)
 
 
-@task
-def write_bash_aliases(context):
+def app_ensure_dot_env(context):
+    """
+    Ensures that .env exists.
+    """
+    print(PRINT_LN)
+    print("👀 Checking '.env'...")
+
+    if ENV_FILE.exists():
+        print("⏭️  '.env' already exists, skipping.")
+    else:
+        print("✨ Creating '.env'...")
+        context.run(f"cp {GIT_ROOT / '.env.example'} {ENV_FILE}")
+        print("✅ '.env' created!")
+    print(PRINT_LN)
+
+
+def app_bash_aliases(context):
     """
     Writes onair/offair bash aliases
     """
@@ -97,26 +106,7 @@ EOT"""
     print(PRINT_LN)
 
 
-@task
-def install_dependencies(context):
-    """
-    perform a 'poetry install' to install python packages
-    """
-    context.run("poetry install")
-
-    ensure_dot_env(context)
-
-
-@task
-def update_dependencies(context):
-    """
-    perform a 'poetry update' to update python packages
-    """
-    context.run("poetry update")
-
-
-@task
-def deploy_scripts(context):
+def app_scripts_deploy(context):
     """
     Deploys onair/offair scripts at the user's home dir.
     """
@@ -149,9 +139,27 @@ def deploy_scripts(context):
 
 
 @task
+def project_setup(context):
+    """
+    Perform a 'poetry install' to install python packages
+    """
+    context.run("poetry install")
+
+    app_ensure_dot_env(context)
+
+
+@task
+def project_update(context):
+    """
+    Perform a 'poetry update' to update python packages
+    """
+    context.run("poetry update")
+
+
+@task
 def discover_process_names(context, query=None):
     """
-    List running processes.
+    List running processes on the host; query optional.
     """
     with context.cd(GIT_ROOT):
         if query:
@@ -160,42 +168,6 @@ def discover_process_names(context, query=None):
             )
         else:
             context.run("poetry run python host/discover_processes.py")
-
-
-@task
-def get_camera_state(context):
-    """
-    Gets the current camera state and writes it to the local stafefile.
-    """
-    with context.cd(GIT_ROOT):
-        context.run("poetry run python host/get_vda_power_state.py")
-
-
-@task
-def get_device_state(context):
-    """
-    Gets the current homekit device state and writes it to the local stafefile.
-    """
-    with context.cd(GIT_ROOT):
-        context.run("poetry run python host/get_device_state.py")
-
-
-# @task
-# def on_air(context):
-#     """
-#     Turns on the homekit device
-#     """
-#     with context.cd(GIT_ROOT):
-#         context.run("poetry run python on_air.py")
-
-
-# @task
-# def off_air(context):
-#     """
-#     Turns off the homekit device
-#     """
-#     with context.cd(GIT_ROOT):
-#         context.run("poetry run python off_air.py")
 
 
 @task
@@ -209,7 +181,7 @@ def manage_cron(
 ):
     # pylint: disable=[R0913,R0912,R1705]
     """
-    manages the crontab. Requires an 'action'
+    Manages the crontab; requires an 'action'
     """
     with context.cd(GIT_ROOT / "scripts"):
         if action == "add":
