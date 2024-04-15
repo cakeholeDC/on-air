@@ -50,9 +50,11 @@ Later, you'll add the names of these shortcuts to `.env` as `SHORTCUT_ON` and `S
 
 ### Install
 1. Install project dependencies and create .env
-    - `inv install-dependencies` <!-- TODO: rename to setup project or something like that. -->
+    - `inv project-setup`
 1. Write convenience scripts and bash aliases
-    - `inv install`
+    - `inv app-install`
+1. Setup the cronjob (if desired)
+    - [#cron-scheduler](#cron-scheduler-recommended)
 
 ### Configuration
 The application is configured via the `.env` file.
@@ -124,8 +126,8 @@ Sample cron schedules have been provided in the in the `./cronjobs/` directory.
 
 
 ## Uninstall
-1. Remove convenience scripts, bash aliases, and python venv
-    - `inv uninstall`
+1. Remove convenience scripts and bash aliases
+    - `inv app-uninstall`
 1. Remove the crontab entry, if applicable
     - `inv manage-cron --action list`
     - `inv manage-cron --action remove --line-num {N}`
