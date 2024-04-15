@@ -11,7 +11,7 @@ def update_cache(cache: str, value: bool) -> tuple[Path, bool]:
     """
     cache_path = Path(cache)
     # pylint: disable-next=W1203
-    logger.debug(f"🤑 Updating cache: {cache_path} => {value}")  # pylint: disable=W1203
+    logger.debug(f"🤑 Updating cache: {cache_path} => {value}")
     with open(cache_path, "w+", encoding="utf-8") as cache_file:
         cache_file.write(str(value))
         cache_file.close()
@@ -28,5 +28,5 @@ def read_cache(cache: Path) -> tuple[Path, bool]:
     with open(cache_path, "r", encoding="utf-8") as cache_file:
         value = cache_file.readlines()[0]
     # pylint: disable-next=W1203
-    logger.debug(f"👀 Reading cache: {cache_path} = {value}")  # pylint: disable=W1203
+    logger.debug(f"👀 Reading cache: {cache_path} = {value}")
     return (cache_path, value == "True")

@@ -89,7 +89,7 @@ def is_app_open() -> bool:
             if process_name in CONFIG["TRIGGER_APPS"]:
                 found_processes.append(process_name)
                 logger.debug(  # pylint: disable=W1203
-                    f"🏃‍➡️ Running process named '{process_name}' found!"  # pylint: disable=W1203
+                    f"🏃‍➡️ Running process named '{process_name}' found!"
                 )
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
