@@ -1,0 +1,82 @@
+# This workflow will install Python dependencies, run tests and lint with one or more versions of Python
+# For more information see: 
+# - https://github.com/actions/starter-workflows/blob/main/ci/python-package.yml
+# - https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Static Analysis
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - main
+  
+permissions:
+  contents: read
+
+jobs:
+  test-and-lint:
+    strategy:
+      fail-fast: true
+    runs-on: ubuntu-latest
+    steps:
+      #----------------------------------------------
+      # Check-out repo
+      #----------------------------------------------
+      - name: ⤵️ Check out repository
+        uses: actions/checkout@v3
+      #----------------------------------------------
+      # Set-up python
+      #----------------------------------------------
+      - name: 🐍 Setup up python 3.11
+        # run: sudo apt-get install python3.11
+        uses: actions/setup-python@v3
+      #----------------------------------------------
+      # Install & configure poetry
+      #----------------------------------------------
+      - name: 📖 Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+      #----------------------------------------------
+      # Load cached venv if cache exists
+      #----------------------------------------------
+      - name: 🤑 Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+      #----------------------------------------------
+      # Install dependencies if cache does not exist
+      #----------------------------------------------
+      - name: 📦 Install Packages
+        # if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root --with test --with dev
+        # run: poetry install --no-interaction --no-root
+
+      #----------------------------------------------
+      # Invoke pytest, via poetry
+      #----------------------------------------------
+      - name: 🧪 Run tests
+        run: |
+          # python3 -m pip install tomli
+          poetry run pytest .
+      
+      #----------------------------------------------
+      # Invoke 'pylint', via poetry
+      #----------------------------------------------
+      - name: 🧹 Run pylint
+        run: |
+          poetry run pylint *.py */*.py
+
+      #----------------------------------------------
+      # Invoke 'shellcheck'
+      #----------------------------------------------
+      - name: 🦪 Run shellcheck
+        uses: sudo-bot/action-shellcheck@latest
+        with:
+            # https://github.com/koalaman/shellcheck#how-to-use
+            cli-args: "*.sh scripts/*.sh"

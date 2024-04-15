@@ -1,82 +1,131 @@
-# ON AIR
-ON AIR is a python application for turning on a light when a specified application(s) is running. The purpose of this app is to turn a light on to signal to my family that I am currently on a video call.
+# ON AIR 🎙️🚨
+![test-and-lint](https://github.com/cakeholeDC/on-air/actions/workflows/test-and-lint.yml/badge.svg)
 
-This application utilizes the Samsung Smarttings API to control smart home devices utilizing the Smartthings ecosystem.
+ON AIR is an application for turning on a light to signal to my family that I am currently on a video call. 
 
-<!-- ######### TODO: refactor to use Homekit and shortcuts -->
-<!-- shortcuts run "On Air" -->
+This app deploys a script that runs as a cronjob and determines whether the indicator light should be ON or OFF, and then sends a signal to the controller for the device.
 
+The applicaton can be configured to respond to three triggers:
+1. When a specified application(s) is running.
+1. When the webcam is active. Webcam activity is determined by:
+    - Apple's `VDC_Assistant` (a USB webcam) is activated.
+    - Apple's `AppleH13CamIn::setGetPowerStateGated` (the onboard camera) is changed.
+1. When Apples `IOAudioEngineState` is equal to 1 (true / enabled). 
 
----
-## Pre-Requesites
-- [Samsumg Smartthings Hub](https://www.tomsguide.com/us/samsung-smart-things-v3,review-5809.html)
-- Smartthings [Developer account](https://smartthings.developer.samsung.com/)
-- Smartthings compatible [device](https://www.samsung.com/us/smart-home/compatible-devices/) (light bulb, outlet, led strip, etc.)
-    - This device **must** already be configured within Smartthings.
-- Mac OS 11+ (Untested on older OS)
+This application utilizes _Apple HomeKit_ and _Apple Shortcuts_ to control the device.
+
+<!-- TODO: If you're interested in using Smartthings to control your device, see the branch `smartthings` -->
+<!-- TODO: If you're interested in using HomeAssistant to control your device, see the branch `hass` -->
+
+## Pre-Requesites 
+-  macOS Ventura 13.3+
+- Apple [HomeKit](https://www.apple.com/home-app/)
+- Apple [Shortcuts](https://support.apple.com/guide/shortcuts/welcome/ios)
+- HomeKit compatible [device](https://www.apple.com/home-app/accessories/) (light, outlet, or switch recommended)
+    - This device **must** already be paired with HomeKit
 
 ## Dependencies
-- python
-- [poetry](https://python-poetry.org/)
+- [homebrew](https://brew.sh/) => `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
+- [pipx](https://pypa.github.io/pipx/) => `brew install pipx`
+- [poetry](https://python-poetry.org/) => `pipx install poetry`
     - Note: Do not install poetry using homebrew
-- [python-smartthings](https://pypi.org/project/python-smartthings/)
+- [invoke](https://github.com/pyinvoke/invoke) => `pipx install invoke`
+- python 3.12
 
----
 ## Setup
-### Configure Environment
-1. Create local environment
-    - `poetry install`
-2. Create your `.env` file
-    - `cp .env.example .env`
-3. Open `.env` in your preferred code editor.
-4. Obtain a [smartthings personal access token](https://account.smartthings.com/tokens) fom the Smartthings developer hub.
-5. Set your personal access token as the value of `SMARTTHINGS_TOKEN` in `.env`
-6. Use the API to discover devices:
-    - `poetry run python3 get_device_list.py`
-7. Capture your desired device's `ID` from the output and set it as the value of `DEVICE_GUID` in `.env`
+### Create Apple Shortcuts
+Shortcuts can be created on macOS or iOS. 
 
-### Configure Applications
+Open the Shortcuts app and create two new shortcuts. One to turn on your device, and one to turn it off. 
+
+1. For the action, select the **Home App**
+1. From the list of actions, select **Control**
+1. From the _Scenes and Accessories_ list, select your **device or scene**
+1. Click **Next**
+1. Select your **device's state**
+1. Click **Done**
+1. **Name the shortcut** and click **Done**
+
+Later, you'll add the names of these shortcuts to `.env` as `SHORTCUT_ON` and `SHORTCUT_OFF`.
+
+### Install
+1. Install project dependencies and create .env
+    - `inv install-dependencies` <!-- TODO: rename to setup project or something like that. -->
+1. Write convenience scripts and bash aliases
+    - `inv install`
+
+### Configuration
+The application is configured via the `.env` file.
+
+| Variable       | Type        | Usage      |
+| -------------- | ----------- | ---------- |
+| TRIGGER_APPS   | List ["str"]| [Process name(s)](#trigger-apps) to trigger the device |
+| ENABLE_VIDEO   | Boolean     | Enable trigger for webcam activation | 
+| ENABLE_AUDIO   | Boolean     | Enable trigger for microphone activation | 
+| DEVICE_CACHE   | String      | device cache filename |
+| VIDEO_CACHE    | String      | video cache filename |
+| SHORTCUT_ON    | String      | name of Homekit shortut for device on |
+| SHORTCUT_OFF   | String      | name of Homekit shortut for device off |
+<!-- TODO: new shortcut for status, and poll that instead of a logfile. -->
+<!-- | SHORTCUT_STATE | String      | name of Homekit shortut for device state | -->
+
+#### Trigger Apps
 1. Open the application(s) that you want to turn on the light.
-2. Run the following command to find the application's proces name. 
-    - Replace _{app-name}_ with the application name.
-    - `poetry run python3 get_process_name.py | grep {app-name}`
-    > **Note:** when searching for **_app-name_**, try using a short keyword like _"code"_ rather than _"Visual Studio Code"_
-    > 
-    > Sometimes, a process name is shortened to _"vscode"_ which would not show up with a multi word query.
-    >
-    > If you still cannot find your process name, run this command without adding ` | grep {app-name}` to see all processes. 
-3. Find the process name in the output.
-4. Copy & Paste the application name(s) into `TRIGGER_APPS` in `.env`
+1. Run the following command to find the application's process name. 
+    - `inv discover-process-names -q {app-name}`
+1. Find the process name in the output.
 
-### Testing the Configuration
-Follow these steps to test your configiuration:
-1. run `./run-on-air.sh` — the light should turn on.
-2. run `./run-off-air.sh` — the light should turn off.
-3. Open the trigger application(s) 
-    - run `./run-app-status-light.sh` — the light should turn on. 
-4. Quit the trigger application(s)
-    - run `./run-app-status-light.sh` — the light should turn off.
+> **Note:** when searching for **_app-name_**, try using a short keyword like _"code"_ rather than _"Visual Studio Code"_
+> 
+> Sometimes, a process name is shortened to _"vscode"_ which would not show up with a multi word query.
+>
+> If you are unable to successfully query for the process, run the command without `-q {app-name}` to view *all* running processes. 
 
----
-## Automation
+### Manual Usage
+A cool party trick is being able to turn the light on or off from the command line. After running the install steps, you can manually control the light with the `onair` and `offair` commands. These commands do not override the cron process.
+
+### Automation
 To automate your ON AIR light, schedule a cron job to run the script `./run-app-status-light.sh`
+
+#### Cron Scheduler (Recommended)
+Use the builtin scheduler to write your crontab entry.
+- `inv manage-cron [options]`
+
+The scheduler accepts the options below:
+```sh
+Options:
+  # the action to perform. Must be "add", "list" or "remove"
+  -a STRING, --action=STRING
+  # run every N minutes. Use 0 for every minute => only for action=add
+  -i INT, --interval-min=INT
+  # starting at hour (24H) => only for action=add
+  -s INT, --start-hour=INT
+  # ending at hour (24H) => only for action=add
+  -e INT, --end-hour=INT
+  # line number to remove => only for action=remove
+  -l INT, --line-num=INT
+```
+
+Examples:
+- `inv manage-cron --action add --interval-min 5 --start-hour 7 --end-hour 15`
+- `inv manage-cron --action remove --line-num 3`
+- `inv manage-cron --action list`
+
+#### Manually (Legacy)
+1. Open crontab list with `crontab -e`
+2. Add your cron schedule to the crontab list
+3. Save and Exit vim with `:wq`
 
 Sample cron schedules have been provided in the in the `./cronjobs/` directory.
 - Every 5th Minute, MON-FRI 9am-5pm
 - Every Minute, Every Day
 
-
-### Adding a cron job
-1. Open crontab list with `crontab -e`
-2. Add your cron schedule to the crontab list
-3. Save and Exit vim with `:wq`
-
 > Need help with cron scheduling? Check out [crontab.guru](https://crontab.guru/)
 
 
----
-## Tips & Tricks
-### Terminal Aliases
-A cool party trick is being able to turn the light on or off from the command line. This can be accomplished by adding aliases to your `$PATH` that run the on/off scripts.
-
-Run `./scripts/deploy_terminal_alias` to quickly configure your `$PATH` with `onair` and `offair` aliases for controlling the light. 
+## Uninstall
+1. Remove convenience scripts, bash aliases, and python venv
+    - `inv uninstall`
+1. Remove the crontab entry, if applicable
+    - `inv manage-cron --action list`
+    - `inv manage-cron --action remove --line-num {N}`

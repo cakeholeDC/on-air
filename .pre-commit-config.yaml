@@ -1,0 +1,61 @@
+# To use:
+#
+#     pre-commit run -a
+#
+# Or:
+#
+#     pre-commit install  # (runs every time you commit in git)
+#
+# To update this file:
+#
+#     pre-commit autoupdate
+#
+# See https://github.com/pre-commit/pre-commit
+#
+# Based on:
+# https://github.com/mpnunez/pybind11-conan-example/blob/a259bfe9bd99ded80f4bf16ce7c639e140f26408/.pre-commit-config.yaml
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-yaml
+#     -   id: end-of-file-fixer
+#     -   id: trailing-whitespace
+-   repo: https://github.com/psf/black
+    rev: 24.3.0
+    hooks:
+    -   id: black
+        args: # arguments to configure black
+        - --line-length=88
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.3.3
+    hooks:
+    -   id: ruff
+        # args: [ "--fix" ]
+-   repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        name: isort (python)
+        language_version: '3.11'
+        args: ["--profile", "black", "--filter-files"]
+-   repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: pylint
+        language: system
+        types: [python]
+        args:
+          [
+            "-rn", # Only display messages
+            # "-sn", # Don't display the score
+          ]
+# -   repo: https://github.com/pylint-dev/pylint
+#     rev: v3.1.0
+#     hooks:
+#     -   id: pylint
+#         args:
+#         - --max-line-length=80
+#         - --ignore-imports=yes
+#         - -d duplicate-code
