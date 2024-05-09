@@ -18,6 +18,8 @@ This application utilizes _Apple HomeKit_ and _Apple Shortcuts_ to control the d
 <!-- TODO: If you're interested in using HomeAssistant to control your device, see the branch `hass` -->
 
 ## Pre-Requesites 
+<!-- TODO: hass supports 12.7.4+ -->
+<!-- TODO: hass compatible device -->
 -  macOS Ventura 13.3+
 - Apple [HomeKit](https://www.apple.com/home-app/)
 - Apple [Shortcuts](https://support.apple.com/guide/shortcuts/welcome/ios)
