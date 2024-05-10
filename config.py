@@ -23,3 +23,19 @@ CONFIG = {
     "SHORTCUT_OFF": os.getenv("SHORTCUT_OFF"),
     "SHORTCUT_STATE": os.getenv("SHORTCUT_STATE"),
 }
+
+PYTEST = {
+    "MOCK_ENTITY_STATE": {
+        "entity_id": "switch.mock",
+        "state": "off",
+        "attributes": {"friendly_name": "mocked-switch"},
+        "last_changed": "2024-05-09T23:50:54.580092+00:00",
+        "last_reported": "2024-05-09T23:50:54.580092+00:00",
+        "last_updated": "2024-05-09T23:50:54.580092+00:00",
+        "context": {
+            "id": "m0ck3dD3v1c31d",
+            "parent_id": None,
+            "user_id": "m0ck3du53r1d",
+        },
+    }
+}
