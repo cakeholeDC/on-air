@@ -15,8 +15,9 @@ def onair():
     elif CONFIG["INTEGRATION"] == "hass":
         turn_on_entity(CONFIG["HASS_ENTITY_ID"])
     elif CONFIG["INTEGRATION"] == "smartthings":
-        logger.error("Smartthings not supported at this time")
+        logger.error("❌ Smartthings not supported at this time")
         sys.exit(1)
+    logger.info("🌕 Turned ON Device")
 
 
 def offair():
@@ -28,5 +29,6 @@ def offair():
     elif CONFIG["INTEGRATION"] == "hass":
         turn_off_entity(CONFIG["HASS_ENTITY_ID"])
     elif CONFIG["INTEGRATION"] == "smartthings":
-        logger.error("Smartthings not supported at this time")
+        logger.error("❌ Smartthings not supported at this time")
         sys.exit(1)
+    logger.info("🌑 Turned OFF Device")

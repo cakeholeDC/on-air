@@ -25,7 +25,6 @@ def handle_logic(
     elif (video_state or audio_state or app_state) and not device_state:
         logger.info("👎 Light should be ON, but is OFF")
         # turn light on
-        logger.info("🌕 Turning ON Device")
         onair()
         # update cache
         update_cache(CONFIG["DEVICE_CACHE"], True)
@@ -34,7 +33,6 @@ def handle_logic(
     elif (not video_state and not audio_state and not app_state) and device_state:
         logger.info("👎 Light should be OFF, but is ON")
         # turn light off
-        logger.info("🌑 Turning OFF Device")
         offair()
         # update cache
         update_cache(CONFIG["DEVICE_CACHE"], False)
@@ -46,7 +44,7 @@ def handle_logic(
 
     # something has gone terribly wrong
     else:
-        logger.error("something has gone terribly wrong")
+        logger.error("🤯 Something has gone terribly wrong")
         # do nothing
 
 
