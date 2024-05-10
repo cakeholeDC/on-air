@@ -55,12 +55,12 @@ def validate_config(config: dict):
     if config["INTEGRATION"] not in SUPPORTED_INTEGRATIONS:
         # pylint: disable-next=W1203
         logger.error(
-            f"❌ Unsupported integration: {config['INTEGRATION']} - must be one of {SUPPORTED_INTEGRATIONS}"
+            f"❌ Unsupported integration: '{config['INTEGRATION']}' - must be one of {SUPPORTED_INTEGRATIONS}"
         )
         sys.exit(1)
     else:
         # pylint: disable-next=W1203
-        logger.info(f"🤖🏠 Using Integration: {config['INTEGRATION']}")
+        logger.info(f"🤖🏠 Using Integration: '{config['INTEGRATION']}'")
 
 
 def run():
