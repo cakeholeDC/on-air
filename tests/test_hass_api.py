@@ -11,10 +11,10 @@ def test_get_entity_state(mocker):
 
     # Patch 'requests.get' to return the mock response
     mocker.patch("requests.get", return_value=mock_response)
-
+    print(mock_response)
     # Call the function
     entity_state = get_entity_state(CONFIG["HASS_ENTITY_ID"])
-
+    print(entity_state)
     # assertions
     assert isinstance(entity_state, dict)
     assert entity_state["state"] in ["on", "off"]
@@ -30,10 +30,10 @@ def test_toggle_entity_state(mocker):
 
     # Patch 'requests.get' to return the mock response
     mocker.patch("requests.get", return_value=mock_response)
-
+    print(mock_response)
     # Call the function
     toggled_state = toggle_entity_state(CONFIG["HASS_ENTITY_ID"])
-
+    print(toggled_state)
     # assertions
     assert isinstance(toggled_state, dict)
     assert toggled_state["state"] in ["on", "off"]
