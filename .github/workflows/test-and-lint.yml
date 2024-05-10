@@ -16,7 +16,7 @@ permissions:
   contents: read
 
 env:
-  GITHUB_MOCK_API: "True"
+  MOCK_API: "True"
 
 jobs:
   test-and-lint:
