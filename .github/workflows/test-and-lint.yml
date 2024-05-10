@@ -16,7 +16,7 @@ permissions:
   contents: read
 
 env:
-  HASS_SERVER_URL: "http://mock.url"
+  GITHUB_MOCK_API: "True"
 
 jobs:
   test-and-lint:

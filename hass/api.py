@@ -20,21 +20,14 @@ def get_entity_state(entity_id: str) -> dict:
     }
     payload = {}
 
-    if HASS_BASE_API == "http://mock.url/api":
-        entity_state = {}
-    else:
-        response = requests.request(
-            "GET",
-            url,
-            headers=headers,
-            data=payload,
-            timeout=5,
-        )
+    response = requests.get(
+        url,
+        headers=headers,
+        data=payload,
+        timeout=5,
+    )
 
-        entity_state = json.loads(response.text)
-        # TODO: logger.info
-        print(f"{LOG_MODULE} {entity_id} => GET => {entity_state['state']}")
-    return entity_state
+    return response.json()
 
 
 # TODO: consider 'service' name due to api url.
@@ -47,18 +40,11 @@ def toggle_entity_state(entity_id: str) -> dict:
     }
     payload = json.dumps({"entity_id": entity_id})
 
-    if HASS_BASE_API == "http://mock.url/api":
-        toggled_state = {}
-    else:
-        response = requests.request(
-            "POST",
-            url,
-            headers=headers,
-            data=payload,
-            timeout=5,
-        )
+    response = requests.post(
+        url,
+        headers=headers,
+        data=payload,
+        timeout=5,
+    )
 
-        toggled_state = json.loads(response.text)[0]
-        # TODO: logger.info
-        print(f"{LOG_MODULE} {entity_id} => SET => {toggled_state['state']}")
-    return toggled_state
+    return response.json()
