@@ -31,20 +31,20 @@ def is_video_active() -> bool:
         stdout=subprocess.PIPE,
         check=False,
     )
-    video_state_result = cmd_result.stdout.decode().strip()
+    video_state = cmd_result.stdout.decode().strip()
 
     # handle for no log activity in the last n minutes
-    if video_state_result == "check_cache":
+    if video_state == "check_cache":
         cache_file, video_cache = read_cache(  # pylint: disable=W0612
             CONFIG["VIDEO_CACHE"]
         )
-        video_state_result = str(video_cache)
+        video_state = str(video_cache)
 
-    video_state = video_state_result == "True"
     logger.debug(f"🎥 {video_state=}")  # pylint: disable=W1203
-    update_cache(CONFIG["VIDEO_CACHE"], video_state)
+    video_state_bool = video_state == "True"
+    update_cache(CONFIG["VIDEO_CACHE"], video_state_bool)
 
-    return video_state
+    return video_state_bool
 
 
 def is_audio_active() -> bool:
