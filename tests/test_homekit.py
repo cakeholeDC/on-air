@@ -1,6 +1,6 @@
 import pytest
 
-from homekit.control import homekit_device_off, homekit_device_on, homekit_device_state
+from homekit.api import homekit_device_off, homekit_device_on, homekit_device_state
 
 
 @pytest.mark.skip(reason="test hangs...")

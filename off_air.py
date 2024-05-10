@@ -1,10 +1,10 @@
 from config import CONFIG
-from homekit.control import homekit_device_off
 from host.cache import update_cache
 from host.colors import BLACK, COLOR_NONE, DARK_GRAY
+from host.control import offair
 
 if __name__ == "__main__":
-    homekit_device_off()
+    offair()
     update_cache(CONFIG["DEVICE_CACHE"], False)
 
     print(f"{DARK_GRAY}------------------")

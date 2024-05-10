@@ -1,10 +1,10 @@
 from config import CONFIG
-from homekit.control import homekit_device_on
 from host.cache import update_cache
 from host.colors import COLOR_NONE, GREEN, RED
+from host.control import onair
 
 if __name__ == "__main__":
-    homekit_device_on()
+    onair()
     update_cache(CONFIG["DEVICE_CACHE"], True)
 
     print(f"{GREEN}------------------")

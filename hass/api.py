@@ -4,14 +4,15 @@ import requests
 
 from config import CONFIG
 
-# from host.logger import logger
-
-LOG_MODULE = "🏠 HASS:"
-
 HASS_BASE_API = f"{CONFIG['HASS_SERVER_URL']}/api"
 
 
 def get_entity_state(entity_id: str) -> dict:
+    """
+    GET the state/entity_id object
+
+    Returns an entity/state object
+    """
     url = f"{HASS_BASE_API}/states/{entity_id}"
 
     headers = {
@@ -30,8 +31,12 @@ def get_entity_state(entity_id: str) -> dict:
     return response.json()
 
 
-# TODO: consider 'service' name due to api url.
 def toggle_entity_state(entity_id: str) -> dict:
+    """
+    POST a services/toggle request for a entity_id(s)
+
+    Returns a list of entity/state objects.
+    """
     url = f"{HASS_BASE_API}/services/homeassistant/toggle"
 
     headers = {
@@ -51,6 +56,11 @@ def toggle_entity_state(entity_id: str) -> dict:
 
 
 def turn_on_entity(entity_id: str) -> dict:
+    """
+    POST a services/turn_on request for a entity_id(s)
+
+    Returns a list of entity/state objects.
+    """
     url = f"{HASS_BASE_API}/services/homeassistant/turn_on"
 
     headers = {
@@ -70,6 +80,11 @@ def turn_on_entity(entity_id: str) -> dict:
 
 
 def turn_off_entity(entity_id: str) -> dict:
+    """
+    POST a services/turn_off request for a entity_id(s)
+
+    Returns a list of entity/state objects.
+    """
     url = f"{HASS_BASE_API}/services/homeassistant/turn_off"
 
     headers = {
