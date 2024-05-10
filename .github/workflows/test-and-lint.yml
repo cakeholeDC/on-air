@@ -15,6 +15,9 @@ on:
 permissions:
   contents: read
 
+env:
+  HASS_SERVER_URL: "http://127.0.0.1"
+
 jobs:
   test-and-lint:
     strategy:
