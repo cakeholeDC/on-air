@@ -48,3 +48,41 @@ def toggle_entity_state(entity_id: str) -> dict:
     )
 
     return response.json()
+
+
+def turn_on_entity(entity_id: str) -> dict:
+    url = f"{HASS_BASE_API}/services/homeassistant/turn_on"
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f'Bearer {CONFIG["HASS_API_TOKEN"]}',
+    }
+    payload = json.dumps({"entity_id": entity_id})
+
+    response = requests.post(
+        url,
+        headers=headers,
+        data=payload,
+        timeout=5,
+    )
+
+    return response.json()
+
+
+def turn_off_entity(entity_id: str) -> dict:
+    url = f"{HASS_BASE_API}/services/homeassistant/turn_off"
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f'Bearer {CONFIG["HASS_API_TOKEN"]}',
+    }
+    payload = json.dumps({"entity_id": entity_id})
+
+    response = requests.post(
+        url,
+        headers=headers,
+        data=payload,
+        timeout=5,
+    )
+
+    return response.json()

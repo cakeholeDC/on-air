@@ -9,9 +9,11 @@ load_dotenv()
 GIT_ROOT = Path(__file__).resolve().parent
 
 CONFIG = {
+    # App Configuration
     "ENABLE_VIDEO": os.getenv("ENABLE_VIDEO", "False") == "True",
     "ENABLE_AUDIO": os.getenv("ENABLE_AUDIO", "False") == "True",
     "TRIGGER_APPS": json.loads(os.getenv("TRIGGER_APPS", "[]")),
+    # Host Cache
     "DEVICE_CACHE": str(GIT_ROOT / os.getenv("DEVICE_CACHE", ".cache.device")),
     "VIDEO_CACHE": str(GIT_ROOT / os.getenv("VIDEO_CACHE", ".cache.video")),
     #  Home Assistant
