@@ -1,20 +1,22 @@
 import json
+
 import requests
 
 from config import CONFIG
 
-from host.logger import logger
+# from host.logger import logger
 
-LOG_MODULE="🏠 HASS:"
+LOG_MODULE = "🏠 HASS:"
 
-HASS_BASE_API=f"{CONFIG["HASS_SERVER_URL"]}/api"
+HASS_BASE_API = f"{CONFIG['HASS_SERVER_URL']}/api"
+
 
 def get_entity_state(entity_id: str) -> dict:
     url = f"{HASS_BASE_API}/states/{entity_id}"
 
     headers = {
-        'Content-Type': 'application/json',
-        'Authorization': f'Bearer {CONFIG["HASS_API_TOKEN"]}'
+        "Content-Type": "application/json",
+        "Authorization": f'Bearer {CONFIG["HASS_API_TOKEN"]}',
     }
     payload = {}
 
@@ -23,6 +25,7 @@ def get_entity_state(entity_id: str) -> dict:
         url,
         headers=headers,
         data=payload,
+        timeout=5,
     )
 
     entity_state = json.loads(response.text)
@@ -30,23 +33,23 @@ def get_entity_state(entity_id: str) -> dict:
     print(f"{LOG_MODULE} {entity_id} => GET => {entity_state['state']}")
     return entity_state
 
+
 # TODO: consider 'service' name due to api url.
 def toggle_entity_state(entity_id: str) -> dict:
     url = f"{HASS_BASE_API}/services/homeassistant/toggle"
 
     headers = {
-        'Content-Type': 'application/json',
-        'Authorization': f'Bearer {CONFIG["HASS_API_TOKEN"]}'
+        "Content-Type": "application/json",
+        "Authorization": f'Bearer {CONFIG["HASS_API_TOKEN"]}',
     }
-    payload = json.dumps({
-        "entity_id": entity_id
-    })
+    payload = json.dumps({"entity_id": entity_id})
 
     response = requests.request(
         "POST",
         url,
         headers=headers,
         data=payload,
+        timeout=5,
     )
 
     toggled_state = json.loads(response.text)[0]
