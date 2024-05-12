@@ -3,23 +3,29 @@
 
 ON AIR is an application for turning on a light to signal to my family that I am currently on a video call. 
 
-This app deploys a script that runs as a cronjob and determines whether the indicator light should be ON or OFF, and then sends a signal to the controller for the device.
+This app deploys a cronjob script that determines whether the light should be ON or OFF, and then sends a signal to the integrated IoT system.
 
-The applicaton can be configured to respond to three triggers:
+The application can be configured to respond to three triggers:
 1. When a specified application(s) is running.
 1. When the webcam is active. Webcam activity is determined by:
     - Apple's `VDC_Assistant` (a USB webcam) is activated.
     - Apple's `AppleH13CamIn::setGetPowerStateGated` (the onboard camera) is changed.
 1. When Apples `IOAudioEngineState` is equal to 1 (true / enabled). 
 
-This application utilizes _Apple HomeKit_ and _Apple Shortcuts_ to control the device.
+<!-- TODO: Smartthings: see the branch `smartthings` -->
+This application supports integrations with _Home Assistant_, and _Apple HomeKit_.
 
-<!-- TODO: If you're interested in using Smartthings to control your device, see the branch `smartthings` -->
-<!-- TODO: If you're interested in using HomeAssistant to control your device, see the branch `hass` -->
+## Pre-Requisites  
+Each supported integration has it's own requirements listed below.
 
-## Pre-Requesites 
-<!-- TODO: hass supports 12.7.4+ -->
-<!-- TODO: hass compatible device -->
+### Home Assistant
+-  macOS Monterey 12.7+
+- [Home Assistant](https://www.home-assistant.io/)
+- Home Assistant compatible [device](https://www.home-assistant.io/integrations/) (light, outlet, or switch recommended)
+    - This device **must** already be paired with Home Assistant
+
+### Apple HomeKit
+> **Note:** This app only supports the [new HomeKit architecture](https://support.apple.com/en-us/102287) released in 2023. [Read More](https://www.reddit.com/r/HomeKit/comments/zsir3n/explanation_on_new_homekit_architecture/)
 -  macOS Ventura 13.3+
 - Apple [HomeKit](https://www.apple.com/home-app/)
 - Apple [Shortcuts](https://support.apple.com/guide/shortcuts/welcome/ios)
@@ -32,13 +38,21 @@ This application utilizes _Apple HomeKit_ and _Apple Shortcuts_ to control the d
 - [poetry](https://python-poetry.org/) => `pipx install poetry`
     - Note: Do not install poetry using homebrew
 - [invoke](https://github.com/pyinvoke/invoke) => `pipx install invoke`
-- python 3.12
+- [python 3.11](https://www.python.org/downloads/release/python-3110/) => `brew install python@3.11`
 
 ## Setup
-### Create Apple Shortcuts
+### Home Assistant: Setup Entity
+1. Add your Server URL to `.env` as `HASS_SERVER_URL`.
+1. Add the necessary Home Assistant [integration](https://www.home-assistant.io/getting-started/integration/) for your device.
+    - Capture the [`entity_id`](https://www.home-assistant.io/docs/configuration/customizing-devices/) you wish to control
+    - Add the `entity_id` to `.env` as `HASS_ENTITY_ID`.
+1. Create a Home Assistant [Long Lived Access Token](https://developers.home-assistant.io/docs/auth_api/#long-lived-access-token)
+    - Add the `token` to `.env` as `HASS_ENTITY_ID`.
+
+### HomeKit: Create Apple Shortcuts
 Shortcuts can be created on macOS or iOS. 
 
-Open the Shortcuts app and create two new shortcuts. One to turn on your device, and one to turn it off. 
+Open the Shortcuts app and create two new shortcuts. One to turn your device ON, and one to turn it OFF. 
 
 1. For the action, select the **Home App**
 1. From the list of actions, select **Control**
@@ -48,7 +62,7 @@ Open the Shortcuts app and create two new shortcuts. One to turn on your device,
 1. Click **Done**
 1. **Name the shortcut** and click **Done**
 
-Later, you'll add the names of these shortcuts to `.env` as `SHORTCUT_ON` and `SHORTCUT_OFF`.
+Add the names of these shortcuts to `.env` as `SHORTCUT_ON` and `SHORTCUT_OFF`.
 
 ### Install
 1. Install project dependencies and create .env
@@ -66,12 +80,14 @@ The application is configured via the `.env` file.
 | TRIGGER_APPS   | List ["str"]| [Process name(s)](#trigger-apps) to trigger the device |
 | ENABLE_VIDEO   | Boolean     | Enable trigger for webcam activation | 
 | ENABLE_AUDIO   | Boolean     | Enable trigger for microphone activation | 
+| SMART_HOME_TYPE   | String     | The IoT system to integrate | 
 | DEVICE_CACHE   | String      | device cache filename |
 | VIDEO_CACHE    | String      | video cache filename |
+| HASS_SERVER_URL    | String      | http://hass.server:8123 |
+| HASS_API_TOKEN    | String      | Home Assistant [Long Lived Access Token](https://developers.home-assistant.io/docs/auth_api/#long-lived-access-token) |
+| HASS_ENTITY_ID    | String      | switch.identifier |
 | SHORTCUT_ON    | String      | name of Homekit shortut for device on |
 | SHORTCUT_OFF   | String      | name of Homekit shortut for device off |
-<!-- TODO: new shortcut for status, and poll that instead of a logfile. -->
-<!-- | SHORTCUT_STATE | String      | name of Homekit shortut for device state | -->
 
 #### Trigger Apps
 1. Open the application(s) that you want to turn on the light.
@@ -125,7 +141,6 @@ Sample cron schedules have been provided in the in the `./cronjobs/` directory.
 - Every Minute, Every Day
 
 > Need help with cron scheduling? Check out [crontab.guru](https://crontab.guru/)
-
 
 ## Uninstall
 1. Remove convenience scripts and bash aliases
