@@ -3,7 +3,7 @@ import sys
 from config import CONFIG, SUPPORTED_INTEGRATIONS
 from host.cache import read_cache, update_cache
 from host.control import offair, onair
-from host.logger import logger
+from host.logger import logger, sanitize_config
 from host.scraping import is_app_open, is_audio_active, is_video_active
 
 
@@ -49,7 +49,10 @@ def handle_logic(
 
 
 def validate_config(config: dict):
-    logger.debug(f"🛠️ CONFIG={config}")  # pylint: disable=W1203
+    """
+    Validates the config object, ensuring a valid IoT integration
+    """
+    logger.debug(f"🛠️ CONFIG={sanitize_config(config)}")  # pylint: disable=W1203
     if config["INTEGRATION"] not in SUPPORTED_INTEGRATIONS:
         # pylint: disable-next=W1203
         logger.error(

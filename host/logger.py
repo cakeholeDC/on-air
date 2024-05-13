@@ -22,3 +22,16 @@ logger = logging.getLogger("onair")
 logger.setLevel(logging.DEBUG)
 
 logger.addHandler(my_handler)
+
+
+def sanitize_config(config: dict) -> dict:
+    """
+    Removes API credentials from log output
+    """
+    # TODO: ultimately sanitize the smartthings token
+    keys_to_sanitize = ["HASS_API_TOKEN"]
+    sanitized_config = dict(config)
+
+    for key in keys_to_sanitize:
+        sanitized_config[key] = "*******"
+    return sanitized_config
