@@ -95,9 +95,9 @@ def is_app_open() -> bool:
             pass
 
     if len(found_processes) > 0:  # pylint: disable=R1705
-        logger.debug("app_state='True'")
+        logger.debug("💿 app_state='True'")
         return True
     else:
         logger.debug("🙈 No running processes found")
-        logger.debug("app_state='False'")
+        logger.debug("💿 app_state='False'")
         return False
