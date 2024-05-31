@@ -1,7 +1,9 @@
-from config import CONFIG
-from homekit.control import homekit_device_off, homekit_device_on
+import sys
+
+from config import CONFIG, SUPPORTED_INTEGRATIONS
 from host.cache import read_cache, update_cache
-from host.logger import logger
+from host.control import offair, onair
+from host.logger import logger, sanitize_config
 from host.scraping import is_app_open, is_audio_active, is_video_active
 
 
@@ -16,39 +18,53 @@ def handle_logic(
     """
     # light should be on, and is on
     if (video_state or audio_state or app_state) and device_state:
-        logger.info("Light should be ON, and is ON")
+        logger.info("👍 Light should be ON, and is ON")
         # do nothing
 
     # light should be on, but is off
     elif (video_state or audio_state or app_state) and not device_state:
-        logger.info("Light should be ON, but is OFF")
+        logger.info("👎 Light should be ON, but is OFF")
         # turn light on
-        logger.info("🌕 Turning ON Device")
-        homekit_device_on()
+        onair()
         # update cache
         update_cache(CONFIG["DEVICE_CACHE"], True)
 
     # light should be off, but is on
     elif (not video_state and not audio_state and not app_state) and device_state:
-        logger.info("Light should be OFF, but is ON")
+        logger.info("👎 Light should be OFF, but is ON")
         # turn light off
-        logger.info("🌑 Turning OFF Device")
-        homekit_device_off()
+        offair()
         # update cache
         update_cache(CONFIG["DEVICE_CACHE"], False)
 
     # light should be off, and is off
     elif (not video_state and not audio_state and not app_state) and not device_state:
-        logger.info("Light should be OFF, and is OFF")
+        logger.info("👍 Light should be OFF, and is OFF")
         # do nothing
 
     # something has gone terribly wrong
     else:
-        logger.error("something has gone terribly wrong")
+        logger.error("🤯 Something has gone terribly wrong")
         # do nothing
 
 
-def on_air():
+def validate_config(config: dict):
+    """
+    Validates the config object, ensuring a valid IoT integration
+    """
+    logger.debug(f"🛠️ CONFIG={sanitize_config(config)}")  # pylint: disable=W1203
+    if config["INTEGRATION"] not in SUPPORTED_INTEGRATIONS:
+        # pylint: disable-next=W1203
+        logger.error(
+            f"❌ Unsupported integration: '{config['INTEGRATION']}' - must be one of {SUPPORTED_INTEGRATIONS}"
+        )
+        sys.exit(1)
+    else:
+        # pylint: disable-next=W1203
+        logger.info(f"🤖🏠 Using Integration: '{config['INTEGRATION']}'")
+
+
+def run():
     """
     Runs the application.
 
@@ -57,7 +73,7 @@ def on_air():
     Passes host state to the device logic handler.
     """
     logger.info("🎙️🚨 Running onair")
-    logger.debug(f"{CONFIG=}")  # pylint: disable=W1203
+    validate_config(CONFIG)
 
     # Get video IO state if config.video is enabled
     video_state = is_video_active() if CONFIG["ENABLE_VIDEO"] else False
@@ -84,4 +100,4 @@ def on_air():
 
 
 if __name__ == "__main__":
-    on_air()
+    run()

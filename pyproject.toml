@@ -8,12 +8,14 @@ authors = ["Kyle Cole <cakeholeDC@users.noreply.github.com>"]
 python = "^3.11"
 python-dotenv = "^0.19.2"
 psutil = "^5.9.8"
+requests = "^2.31.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.1.1"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^3.1.0"
+pytest-mock = "^3.14.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
