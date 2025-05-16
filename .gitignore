@@ -4,3 +4,4 @@
 *.log
 *.log.*
 **__pycache__**
+onair.cfg
