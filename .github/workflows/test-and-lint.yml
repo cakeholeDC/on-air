@@ -63,11 +63,17 @@ jobs:
       #----------------------------------------------
       # Invoke pytest, via poetry
       #----------------------------------------------
-      - name: 🧪 Run tests
+      - name: 🧪 Run Python tests
         run: |
           # python3 -m pip install tomli
           poetry run pytest .
-      
+
+      #----------------------------------------------
+      # Run go tests
+      #----------------------------------------------
+      - name: 🧪 Run Go Tests
+        uses: robherley/go-test-action@v0
+
       #----------------------------------------------
       # Invoke 'pylint', via poetry
       #----------------------------------------------
