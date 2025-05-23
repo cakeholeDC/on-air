@@ -62,6 +62,21 @@ func GetConfig() (*AppConfig, error) {
 	return c, nil
 }
 
+func (c *AppConfig) SetConfigValue(key string, value string) {
+	switch key {
+	case "home_assistant_url":
+		c.HomeAssistantURL = value
+	case "home_assistant_token":
+		c.HomeAssistantToken = value
+	case "home_assistant_entity":
+		c.HomeAssistantEntity = value
+	default:
+		return
+	}
+
+	c.Save(CFG_FILE_PATH)
+}
+
 func (c *AppConfig) Save(filePath string) error {
 	data, err := yaml.Marshal(c)
 	if err != nil {

@@ -23,3 +23,16 @@ func TestGetConfig(t *testing.T) {
 	}
 	assert.Equal(t, "", cfg.HomeAssistantURL, "Expected home_assistant_url to be ''")
 }
+
+func TestSetConfigValue(t *testing.T) {
+	setupTestEnv(t)
+	// Tests that a config value is properly set, and written to disk
+	c := AppConfig{}
+	c.SetConfigValue("home_assistant_url", "http://example.com")
+	c.SetConfigValue("home_assistant_token", "token123")
+
+	cfg, _ := GetConfig()
+	assert.Equal(t, "token123", cfg.HomeAssistantToken, "Expected home_assistant_token to be 'token123'")
+	assert.Equal(t, "http://example.com", cfg.HomeAssistantURL, "Expected home_assistant_url to be 'http://example.com'")
+}
+
