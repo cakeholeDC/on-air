@@ -2,7 +2,6 @@ package appconfig
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/cakeholeDC/on-air/common"
@@ -54,6 +53,7 @@ func GetConfig() (*AppConfig, error) {
 			c.Save(CFG_FILE_PATH)
 			return c, nil
 		} else {
+			log.Error(fmt.Sprintf("Error reading config file: %s", err))
 			return nil, err
 		}
 	}
@@ -61,6 +61,7 @@ func GetConfig() (*AppConfig, error) {
 	// parse the config into a struct
 	err = yaml.Unmarshal(data, &c)
 	if err != nil {
+		log.Error(fmt.Sprintf("Error parsing config file: %s", err))
 		return nil, err
 	}
 
@@ -68,7 +69,7 @@ func GetConfig() (*AppConfig, error) {
 }
 
 func (c *AppConfig) SetConfigValue(key string, value string) {
-	log.Info(fmt.Sprintf("setting \033[1m%s\033[0m as \033[1m%s\033[0m", key, value))
+	log.Info(fmt.Sprintf("setting config: %s=%s", key, value))
 	switch key {
 	case "home_assistant_url":
 		c.HomeAssistantURL = value
@@ -84,9 +85,10 @@ func (c *AppConfig) SetConfigValue(key string, value string) {
 }
 
 func (c *AppConfig) Save(filePath string) error {
-	log.Info(fmt.Sprintf("saving config: \033[1m%s\033[0m", filePath))
+	log.Debug(fmt.Sprintf("saving config: %s", filePath))
 	data, err := yaml.Marshal(c)
 	if err != nil {
+		log.Error(fmt.Sprintf("Error marshalling config: %s", err))
 		return err
 	}
 	return common.WriteFileBlob(filePath, data)
