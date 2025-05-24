@@ -77,6 +77,18 @@ func (c *AppConfig) SetConfigValue(key string, value string) {
 		c.HomeAssistantToken = value
 	case "home_assistant_entity":
 		c.HomeAssistantEntity = value
+	case "onair_enable_camera":
+		if value == "true" {
+			c.OnairEnableCamera = true
+		} else {
+			c.OnairEnableCamera = false
+		}
+	case "onair_enable_microphone":
+		if value == "true" {
+			c.OnairEnableMicrophone = true
+		} else {
+			c.OnairEnableMicrophone = false
+		}
 	default:
 		return
 	}

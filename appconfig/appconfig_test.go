@@ -30,9 +30,11 @@ func TestSetConfigValue(t *testing.T) {
 	c := AppConfig{}
 	c.SetConfigValue("home_assistant_url", "http://example.com")
 	c.SetConfigValue("home_assistant_token", "token123")
+	c.SetConfigValue("onair_enable_camera", "true")
 
 	cfg, _ := GetConfig()
 	assert.Equal(t, "token123", cfg.HomeAssistantToken, "Expected home_assistant_token to be 'token123'")
 	assert.Equal(t, "http://example.com", cfg.HomeAssistantURL, "Expected home_assistant_url to be 'http://example.com'")
+	assert.Equal(t, true, cfg.OnairEnableCamera, "Expected onair_enable_camera to be 'true'")
 }
 
