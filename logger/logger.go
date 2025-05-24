@@ -44,10 +44,10 @@ func init() {
 	logWriter = &lumberjack.Logger{
 		// TODO: make this configurable
 		Filename:   LOG_FILE_PATH,
-		MaxSize:    1, // megabytes
-		MaxBackups: 5, // number of backups
-		MaxAge:     7, // days, 0 means no removal based on age
-		Compress:   false,
+		MaxSize:    1,     // megabytes
+		MaxBackups: 5,     // number of backups
+		MaxAge:     7,     // days, 0 means no removal based on age
+		Compress:   false, // compress using gzip. The default is not to perform compression.
 	}
 }
 
