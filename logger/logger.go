@@ -9,9 +9,11 @@ import (
 
 // Logger is the exported logger instance
 var Logger *slog.Logger
-var LOGFILE string = "onair.log"
 
-var logFileHandle *os.File
+var LOG_FILE_PATH string = "onair.log"
+
+// used as the in memory log file
+var logFile *os.File
 
 type customHandler struct {
 	module string
@@ -45,7 +47,7 @@ func (h *customHandler) WithGroup(name string) slog.Handler {
 // init opens the log file once when the package is loaded
 func init() {
 	var err error
-	logFileHandle, err = os.OpenFile(LOGFILE, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	logFile, err = os.OpenFile(LOG_FILE_PATH, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		panic(fmt.Sprintf("failed to open log file: %v", err))
 	}
@@ -53,11 +55,11 @@ func init() {
 
 // Init initializes the logger with a specified module name
 func Init(module string) {
-	handler := &customHandler{module: module, file: logFileHandle}
+	handler := &customHandler{module: module, file: logFile}
 	Logger = slog.New(handler)
 }
 
 // New creates a new logger for a module, always using the log file
 func New(module string) *slog.Logger {
-	return slog.New(&customHandler{module: module, file: logFileHandle})
+	return slog.New(&customHandler{module: module, file: logFile})
 }

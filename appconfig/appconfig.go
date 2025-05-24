@@ -25,15 +25,7 @@ var log = logger.New("config")
 
 func init() {
 	// TODO: remove all this.
-	homedir, _ := os.UserHomeDir()
-	fmt.Println("HOMEDIR=" + homedir)
-	pwd, _ := os.Getwd()
-	fmt.Println("PWD=" + pwd)
-
-	log.Info("Info")
-	log.Debug("Debug")
-	log.Warn("Warn")
-	log.Error("Error")
+	log.Error("🚨 This isn't an error. This is the init function of the config module. Make sure this gets removed.")
 }
 
 func (c *AppConfig) Print() {
@@ -45,15 +37,19 @@ func GetConfig() (*AppConfig, error) {
 	// create a new config struct
 	c := &AppConfig{}
 	// read the file from disk
-	log.Info(fmt.Sprintf("reading config: \033[1m%s\033[0m", CFG_FILE_PATH))
+	log.Debug(fmt.Sprintf("reading config: %s", CFG_FILE_PATH))
 	data, err := common.ReadFileBlob(CFG_FILE_PATH)
 
 	// check if the file exists
 	if err != nil {
 		// if the file is not found, create a new config file
 		if strings.Contains(err.Error(), "no such file") {
+			// log the action
 			log.Info("Config file does not exist.")
-			log.Info(fmt.Sprintf("Creating config file: \033[1m%s\033[0m\n", CFG_FILE_PATH))
+			log.Info(fmt.Sprintf("Creating config file: %s", CFG_FILE_PATH))
+			// print for the user
+			fmt.Println("Config file does not exist.")
+			fmt.Printf("Creating config file: %s\n", CFG_FILE_PATH)
 			// write the empty config to the file
 			c.Save(CFG_FILE_PATH)
 			return c, nil
