@@ -76,6 +76,18 @@ name: John
 	}
 }
 
+func TestGetEnv(t *testing.T) {
+	// Test the Getenv function
+	os.Setenv("TEST_ENV", "test_value")
+	defer os.Unsetenv("TEST_ENV") // Clean up after test
+
+	value := GetEnv("TEST_ENV", "default_value")
+	assert.Equal(t, "test_value", value, "Expected 'test_value' for TEST_ENV")
+
+	defaultValue := GetEnv("NON_EXISTENT_ENV", "default_value")
+	assert.Equal(t, "default_value", defaultValue, "Expected 'default_value' for NON_EXISTENT_ENV")
+}
+
 func TestReadWriteFileBlob(t *testing.T) {
 	// Test the ReadFileBlob function
 	testFile := "test.txt"

@@ -22,6 +22,13 @@ func PrintYAML(i interface{}) {
 	fmt.Println(string(yaml))
 }
 
+func GetEnv(key, fallback string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	return fallback
+}
+
 func ReadFileBlob(filePath string) ([]byte, error) {
 	data, err := os.ReadFile(filePath)
 	if err != nil {
