@@ -88,6 +88,22 @@ func TestGetEnv(t *testing.T) {
 	assert.Equal(t, "default_value", defaultValue, "Expected 'default_value' for NON_EXISTENT_ENV")
 }
 
+func TestGetTerminalSize(t *testing.T) {
+	// Test the getTerminalSize function
+	width, height, _ := GetTerminalSize()
+	// swallow the error for this test
+	assert.Greater(t, width, 0, "Expected terminal width to be greater than 0")
+	assert.Greater(t, height, 0, "Expected terminal height to be greater than 0")
+}
+
+func TestPrintArtStringIfFits(t *testing.T) {
+	// Test the PrintArtStringIfFits function
+	// This test will not fail, but it will print the art string if it fits in the terminal width.
+	// It is a visual test, so we will not assert anything here.
+	content := "Hello, Text Art!"
+	PrintArtStringIfFits(content)
+}
+
 func TestReadWriteFileBlob(t *testing.T) {
 	// Test the ReadFileBlob function
 	testFile := "test.txt"

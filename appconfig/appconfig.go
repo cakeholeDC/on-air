@@ -2,11 +2,11 @@ package appconfig
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/cakeholeDC/on-air/common"
 	"github.com/cakeholeDC/on-air/logger"
-	"github.com/zs5460/art"
 	"gopkg.in/yaml.v2"
 )
 
@@ -18,7 +18,6 @@ type AppConfig struct {
 	OnairEnableMicrophone bool   `yaml:"onair_enable_microphone"`
 }
 
-var CFG_FILE_PATH string = "onair.cfg"
 
 var log = logger.New("config")
 
@@ -27,17 +26,41 @@ func init() {
 	log.Error("🚨 This isn't an error. This is the init function of the config module. Make sure this gets removed.")
 }
 
+func readConfigPath() string {
+	// Read the enviornment variable for the config file path
+	envConfigPath := os.Getenv("ONAIR_CONFIG_FILE_PATH")
+
+	// If the environment variable is not set, use the default path
+	if envConfigPath == "" {
+		userHomeDir, err := os.UserHomeDir()
+		if err != nil {
+			log.Error(fmt.Sprintf("could not determine user home directory: %s", err))
+			return ""
+		}
+		envConfigPath = fmt.Sprintf("%s/.config/onair/onair.cfg", userHomeDir)
+	}
+	// return the config file path
+	return envConfigPath
+}
+
 func (c *AppConfig) Print() {
-	fmt.Println(art.String("onair.cfg"))
+	modName := "onair.cfg"
+	termWidth, _, _ := common.GetTerminalSize()
+	fmt.Println(strings.Repeat("*", termWidth))
+	common.PrintArtStringIfFits(modName)
+	fmt.Println(strings.Repeat("*", termWidth))
+	fmt.Printf("Configuration File: %s\n", readConfigPath())
+	fmt.Println(strings.Repeat("*", termWidth))
 	common.PrintYAML(c)
 }
 
 func GetConfig() (*AppConfig, error) {
+	cfgPath := readConfigPath()
 	// create a new config struct
 	c := &AppConfig{}
 	// read the file from disk
-	log.Debug(fmt.Sprintf("reading config: %s", CFG_FILE_PATH))
-	data, err := common.ReadFileBlob(CFG_FILE_PATH)
+	log.Debug(fmt.Sprintf("reading config: %s", cfgPath))
+	data, err := common.ReadFileBlob(cfgPath)
 
 	// check if the file exists
 	if err != nil {
@@ -45,12 +68,15 @@ func GetConfig() (*AppConfig, error) {
 		if strings.Contains(err.Error(), "no such file") {
 			// log the action
 			log.Info("Config file does not exist.")
-			log.Info(fmt.Sprintf("Creating config file: %s", CFG_FILE_PATH))
+			log.Info(fmt.Sprintf("Creating config file: %s", cfgPath))
 			// print for the user
 			fmt.Println("Config file does not exist.")
-			fmt.Printf("Creating config file: %s\n", CFG_FILE_PATH)
+			fmt.Printf("Creating config file: %s\n", cfgPath)
 			// write the empty config to the file
-			c.Save(CFG_FILE_PATH)
+			err := c.Save(cfgPath)
+			if err != nil {
+				log.Error(fmt.Sprintf("Error creating config file: %s", err))
+			}
 			return c, nil
 		} else {
 			log.Error(fmt.Sprintf("Error reading config file: %s", err))
@@ -93,7 +119,7 @@ func (c *AppConfig) SetConfigValue(key string, value string) {
 		return
 	}
 
-	c.Save(CFG_FILE_PATH)
+	c.Save(readConfigPath())
 }
 
 func (c *AppConfig) Save(filePath string) error {
