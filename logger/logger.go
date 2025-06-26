@@ -4,14 +4,13 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"os"
 
 	"github.com/natefinch/lumberjack"
 )
 
 // Logger is the exported logger instance
 var Logger *slog.Logger
-
-var LOG_FILE_PATH string = "onair.log"
 
 // used as the in memory log file
 var logWriter *lumberjack.Logger
@@ -43,7 +42,7 @@ func (h *customHandler) WithGroup(name string) slog.Handler {
 func init() {
 	logWriter = &lumberjack.Logger{
 		// TODO: make this configurable
-		Filename:   LOG_FILE_PATH,
+		Filename:   readEnvLogPath(),
 		MaxSize:    1,     // megabytes
 		MaxBackups: 5,     // number of backups
 		MaxAge:     7,     // days, 0 means no removal based on age
@@ -51,13 +50,24 @@ func init() {
 	}
 }
 
-// Init initializes the logger with a specified module name
-func Init(module string) {
-	handler := &customHandler{module: module}
-	Logger = slog.New(handler)
-}
-
 // New creates a new logger for a module, always using the log file
 func New(module string) *slog.Logger {
 	return slog.New(&customHandler{module: module})
+}
+
+func readEnvLogPath() string {
+	// Read the enviornment variable for the log file path
+	envLogPath := os.Getenv("ONAIR_LOG_FILEPATH")
+
+	// If the environment variable is not set, use the default path
+	if envLogPath == "" {
+		userHomeDir, err := os.UserHomeDir()
+		if err != nil {
+			slog.Error(fmt.Sprintf("could not determine user home directory: %s", err))
+			return ""
+		}
+		envLogPath = fmt.Sprintf("%s/.config/onair/onair.log", userHomeDir)
+	}
+	// return the log file path
+	return envLogPath
 }
