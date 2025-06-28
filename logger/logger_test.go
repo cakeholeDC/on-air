@@ -22,6 +22,8 @@ func setupTestEnv(t *testing.T) {
 		t.Fatalf("Failed to create temporary config file: %v", err)
 	}
 	TEST_LOG_FILE = file.Name()
+	defer os.Remove(TEST_LOG_FILE) // Clean up the temporary file
+
 	os.Setenv("ONAIR_LOG_FILEPATH", TEST_LOG_FILE)
 	t.Cleanup(func() {
 		os.Unsetenv("ONAIR_LOG_FILEPATH")
@@ -37,12 +39,11 @@ func TestReadEnvLogPath(t *testing.T) {
 	assert.Equal(t, TEST_LOG_FILE, envLog, fmt.Sprintf("Expected config file path to be '%s'", TEST_LOG_FILE))
 }
 
-
 func TestLoggerWritesToLogFile(t *testing.T) {
-	t.Skip("Skipping testLoggerWritesToLogFile. Still WIP.")
 	setupTestEnv(t)
 
 	// Re-initialize logger to pick up new file path after env is set
+	ResetLoggerForTest()
 	log := New("testmodule")
 
 	// Write a log entry
@@ -55,24 +56,24 @@ func TestLoggerWritesToLogFile(t *testing.T) {
 	// Open and read the log file
 	f, err := os.Open(readEnvLogPath())
 	if err != nil {
-			t.Fatalf("failed to open log file: %v", err)
+		t.Fatalf("failed to open log file: %v", err)
 	}
 	defer f.Close()
 
 	found := false
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
-			line := scanner.Text()
-			if strings.Contains(line, "[testmodule]") && strings.Contains(line, testMsg) {
-					found = true
-					break
-			}
+		line := scanner.Text()
+		if strings.Contains(line, "[testmodule]") && strings.Contains(line, testMsg) {
+			found = true
+			break
+		}
 	}
 	if err := scanner.Err(); err != nil {
-			t.Fatalf("error reading log file: %v", err)
+		t.Fatalf("error reading log file: %v", err)
 	}
 
 	if !found {
-			t.Errorf("log entry not found in log file")
+		t.Errorf("log entry not found in log file")
 	}
 }

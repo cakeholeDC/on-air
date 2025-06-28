@@ -71,3 +71,14 @@ func readEnvLogPath() string {
 	// return the log file path
 	return envLogPath
 }
+
+// ResetLoggerForTest resets the logger for testing purposes
+func ResetLoggerForTest() {
+	logWriter = &lumberjack.Logger{
+		Filename:   readEnvLogPath(),
+		MaxSize:    1,
+		MaxBackups: 5,
+		MaxAge:     7,
+		Compress:   false,
+	}
+}
