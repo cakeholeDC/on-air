@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/cakeholeDC/on-air/encryption"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -116,6 +117,25 @@ func TestReadWriteFileBlob(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error reading file: %v", err)
 	}
+	assert.Equal(t, false, encryption.IsEncrypted(testFile), "Expected the file to be unencrypted")
 	assert.Equal(t, string(blob), plainText)
 	os.Remove(testFile)
+}
+
+func TestReadWriteEncryptedFileBlob(t *testing.T) {
+	os.Setenv("ONAIR_CONFIG_ENCRYPTION_KEY", "1234567812345678")
+	// Test the ReadFileBlob function
+	testFile := "test-encrypted.txt"
+	plainText := "Hello, World!"
+	err := WriteFileBlob(testFile, []byte(plainText))
+	if err != nil {
+		t.Errorf("Error writing file: %v", err)
+	}
+	blob, err := ReadFileBlob(testFile)
+	if err != nil {
+		t.Errorf("Error reading file: %v", err)
+	}
+	assert.Equal(t, string(blob), plainText)
+	os.Remove(testFile)
+	os.Unsetenv("ONAIR_CONFIG_ENCRYPTION_KEY")
 }

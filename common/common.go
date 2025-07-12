@@ -6,10 +6,14 @@ import (
 	"os"
 	"strings"
 
+	"github.com/cakeholeDC/on-air/encryption"
+	"github.com/cakeholeDC/on-air/logger"
 	"github.com/zs5460/art"
 	"golang.org/x/term"
 	"gopkg.in/yaml.v2"
 )
+
+var log = logger.New("common")
 
 func PrintJSON(i interface{}) {
 	// Marshal the interface to JSON with indentation to make it more readable.
@@ -64,9 +68,47 @@ func ReadFileBlob(filePath string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// check if the file is encrypted
+	encryptionKey := os.Getenv("ONAIR_CONFIG_ENCRYPTION_KEY")
+	if encryption.IsEncrypted(string(data)) {
+		// did they give us a key?
+		if encryptionKey == "" {
+			// if the file is encrypted by there is no key, return an error
+			log.Error("encryption key is not set in the environment variable ONAIR_CONFIG_ENCRYPTION_KEY")
+			return nil, fmt.Errorf("encryption key is not set in the environment variable ONAIR_CONFIG_ENCRYPTION_KEY")
+		}
+		// If the file is encrypted, decrypt it using the encryption key from the environment variable
+		decryptedData, err := encryption.Decrypt(encryptionKey, string(data))
+		if err != nil {
+			return nil, err
+		}
+		data = []byte(decryptedData)
+		// return []byte(decryptedData), nil
+	} else {
+		// if the file is NOT encrypted but a key is provided, return a message
+		if encryptionKey != "" {
+			// TODO: log or return?
+			log.Warn("ONAIR_CONFIG_ENCRYPTION_KEY was provided but the file is not encrypted")
+			return nil, fmt.Errorf("ONAIR_CONFIG_ENCRYPTION_KEY was provided but the file is not encrypted")
+		}
+	}
+	// if the file is not encrypted, return the data as is
 	return data, nil
 }
 
 func WriteFileBlob(filePath string, data []byte) error {
+	// if there's a key, encrypt the data
+	encryptionKey := os.Getenv("ONAIR_CONFIG_ENCRYPTION_KEY")
+	if encryptionKey != "" {
+		// Encrypt the data using the encryption key from the environment variable
+		encryptedData, err := encryption.Encrypt(encryptionKey, string(data))
+		if err != nil {
+			fmt.Println("Error encrypting data:", err)
+			return fmt.Errorf("WriteFileBlob: %w", err)
+		}
+		data = []byte(encryptedData)
+	}
+	// Write the data to the file
 	return os.WriteFile(filePath, data, 0644)
 }
