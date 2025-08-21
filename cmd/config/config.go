@@ -1,11 +1,16 @@
 package config
 
 import (
+	"fmt"
+	"os"
+	"text/tabwriter"
+
 	"github.com/cakeholeDC/on-air/appconfig"
 	"github.com/spf13/cobra"
 	"github.com/zs5460/art"
 )
 
+// TODO: think about the flag terminology.
 var listFlag string = "list"
 var endpointFlag string = "hass-endpoint"
 var tokenFlag string = "hass-token"
@@ -22,6 +27,7 @@ var ConfigCmd = &cobra.Command{
 		// if no flags, return the help menu.
 		if cmd.Flags().NFlag() == 0 {
 			cmd.Help()
+			printEnvVars()
 			return
 		}
 
@@ -59,6 +65,23 @@ var ConfigCmd = &cobra.Command{
 		// always print the config
 		cfg.Print()
 	},
+}
+
+func printEnvVars() {
+	// Print the environment variables
+	fmt.Println("------------------------")
+	fmt.Println("Environment Variables:")
+	fmt.Println("------------------------")
+	userHomeDir, err := os.UserHomeDir()
+	if err != nil {
+		userHomeDir = "$HOME"
+	}
+
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+	fmt.Fprintln(w, "ENV_VAR\tDEFAULT\tDESCRIPTION\t")
+	fmt.Fprintln(w, fmt.Sprintf("ONAIR_CONFIG_FILE_PATH\t%s/.config/onair/onair.cfg\t(optional) path to the config file", userHomeDir))
+	fmt.Fprintln(w, "ONAIR_CONFIG_ENCRYPTION_KEY\tnull\t(optional) key to encrypt/decrypt the config file")
+	w.Flush()
 }
 
 func init() {

@@ -59,7 +59,7 @@ func PrintArtStringIfFits(content string) {
 		fmt.Println(artString)
 	} else {
 		// Print the content if the art string does not fit.
-		fmt.Printf("* %s\n", content)
+		fmt.Printf("** %s **\n", content)
 	}
 }
 
@@ -75,7 +75,8 @@ func ReadFileBlob(filePath string) ([]byte, error) {
 		// did they give us a key?
 		if encryptionKey == "" {
 			// if the file is encrypted by there is no key, return an error
-			log.Error("encryption key is not set in the environment variable ONAIR_CONFIG_ENCRYPTION_KEY")
+			// TODO: log or return?
+			log.Error("File is encrypted but there is no ONAIR_CONFIG_ENCRYPTION_KEY")
 			return nil, fmt.Errorf("encryption key is not set in the environment variable ONAIR_CONFIG_ENCRYPTION_KEY")
 		}
 		// If the file is encrypted, decrypt it using the encryption key from the environment variable

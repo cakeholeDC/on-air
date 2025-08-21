@@ -59,7 +59,6 @@ func Health(client HTTPClient) (HealthResponse, error) {
 		log.Error("Failed to decode JSON response: " + err.Error())
 	}
 
-	// fmt.Println(string(body))
 	common.PrintJSON(r)
 	return r, nil
 }

@@ -18,13 +18,7 @@ type AppConfig struct {
 	OnairEnableMicrophone bool   `yaml:"onair_enable_microphone"`
 }
 
-
 var log = logger.New("config")
-
-func init() {
-	// TODO: remove all this.
-	log.Error("🚨 This isn't an error. This is the init function of the config module. Make sure this gets removed.")
-}
 
 func readConfigPath() string {
 	// Read the enviornment variable for the config file path

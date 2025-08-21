@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/cakeholeDC/on-air/cmd/config"
+	"github.com/cakeholeDC/on-air/cmd/hass"
 	"github.com/spf13/cobra"
 	"github.com/zs5460/art"
 )
@@ -14,6 +15,7 @@ var rootCmd = cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(config.ConfigCmd)
+	rootCmd.AddCommand(hass.HassCmd)
 }
 
 func Execute() {
