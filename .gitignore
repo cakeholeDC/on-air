@@ -4,5 +4,10 @@
 *.log
 *.log.*
 **__pycache__**
+
+# config
 onair.cfg
-onair.log
+
+# compiled binary
+onair
+on-air
