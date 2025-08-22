@@ -42,6 +42,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       #----------------------------------------------
+      # Check-out repo
+      #----------------------------------------------
+      - name: ⤵️ Check out repository
+        uses: actions/checkout@v4
+      #----------------------------------------------
       # Run 'shellcheck'
       #----------------------------------------------
       - name: 🦪 Run shellcheck
