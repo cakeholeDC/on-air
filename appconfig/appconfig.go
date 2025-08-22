@@ -29,12 +29,18 @@ func ReadConfigPath() string {
 		userHomeDir, err := os.UserHomeDir()
 		if err != nil {
 			log.Error(fmt.Sprintf("could not determine user home directory: %s", err))
+
 			return ""
 		}
 		envConfigPath = fmt.Sprintf("%s/.config/onair/onair.cfg", userHomeDir)
 	}
 	// return the config file path
 	return envConfigPath
+}
+
+
+func NewConfig() *AppConfig {
+	return &AppConfig{}
 }
 
 func (c *AppConfig) Print() {
@@ -48,10 +54,6 @@ func (c *AppConfig) Print() {
 	common.PrintYAML(c)
 }
 
-func NewConfig() *AppConfig {
-	return &AppConfig{}
-}
-
 func GetConfig() (*AppConfig, error) {
 	// read the env variable.
 	cfgPath := ReadConfigPath()
@@ -63,6 +65,7 @@ func GetConfig() (*AppConfig, error) {
 	// check if the file exists
 	if err != nil {
 		log.Error(fmt.Sprintf("Error reading config file: %s", err))
+
 		return nil, err
 	}
 
@@ -73,6 +76,7 @@ func GetConfig() (*AppConfig, error) {
 	err = yaml.Unmarshal(data, &c)
 	if err != nil {
 		log.Error(fmt.Sprintf("Error parsing config file: %s", err))
+
 		return nil, err
 	}
 
@@ -112,7 +116,9 @@ func (c *AppConfig) Save(filePath string) error {
 	data, err := yaml.Marshal(c)
 	if err != nil {
 		log.Error(fmt.Sprintf("Error marshalling config: %s", err))
+
 		return err
 	}
+
 	return common.WriteFileBlob(filePath, data)
 }

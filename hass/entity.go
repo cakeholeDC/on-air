@@ -38,16 +38,19 @@ func GetEntity() (HassEntity, error) {
 	cfg, err := appconfig.GetConfig()
 	if err != nil {
 		log.Error(err.Error())
+
 		return HassEntity{}, err
 	}
+
 	return GetEntityWithClient(&http.Client{}, cfg.HomeAssistantURL, cfg.HomeAssistantEntity, cfg.HomeAssistantToken)
 }
 
 // GetEntityWithClient retrieves the state of a specific entity from Home Assistant using a custom HTTP client
 func GetEntityWithClient(client HTTPClient, baseURL, entityID, token string) (HassEntity, error) {
-	req, err := http.NewRequest("GET", baseURL+"/api/states/"+entityID, nil)
+	req, err := http.NewRequest(http.MethodGet, baseURL+"/api/states/"+entityID, nil)
 	if err != nil {
 		log.Error(err.Error())
+
 		return HassEntity{}, err
 	}
 
@@ -60,12 +63,14 @@ func GetEntityWithClient(client HTTPClient, baseURL, entityID, token string) (Ha
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Error(err.Error())
+
 		return HassEntity{}, err
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Error("Failed to read response body: " + err.Error())
+
 		return HassEntity{}, err
 	}
 	defer resp.Body.Close()
@@ -74,8 +79,10 @@ func GetEntityWithClient(client HTTPClient, baseURL, entityID, token string) (Ha
 	err = json.Unmarshal(body, &entity)
 	if err != nil {
 		log.Error("Failed to decode JSON response: " + err.Error())
+
 		return HassEntity{}, err
 	}
+
 	return entity, nil
 }
 
@@ -83,18 +90,21 @@ func ToggleEntity() []HassEntity {
 	cfg, err := appconfig.GetConfig()
 	if err != nil {
 		log.Error(err.Error())
+
 		return []HassEntity{}
 	}
+
 	return ToggleEntityWithClient(&http.Client{}, cfg.HomeAssistantURL, cfg.HomeAssistantEntity, cfg.HomeAssistantToken)
 }
 
 func ToggleEntityWithClient(client HTTPClient, baseURL, entityID, token string) []HassEntity {
 	log.Debug("Toggling entity: " + entityID)
-	req, err := http.NewRequest("POST", baseURL+"/api/services/homeassistant/toggle", nil)
+	req, err := http.NewRequest(http.MethodPost, baseURL+"/api/services/homeassistant/toggle", nil)
 	req.Body = io.NopCloser(strings.NewReader(`{"entity_id": "` + entityID + `"}`))
 
 	if err != nil {
 		log.Error(err.Error())
+
 		return []HassEntity{}
 	}
 
@@ -107,12 +117,14 @@ func ToggleEntityWithClient(client HTTPClient, baseURL, entityID, token string) 
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Error(err.Error())
+
 		return []HassEntity{}
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Error("Failed to read response body: " + err.Error())
+
 		return []HassEntity{}
 	}
 	defer resp.Body.Close()
@@ -121,10 +133,12 @@ func ToggleEntityWithClient(client HTTPClient, baseURL, entityID, token string) 
 	err = json.Unmarshal(body, &entities)
 	if err != nil {
 		log.Error("Failed to decode JSON response: " + err.Error())
+
 		return []HassEntity{}
 	}
 
 	log.Debug("Toggled entity: " + entityID)
+
 	return entities
 }
 
@@ -133,9 +147,17 @@ func SetEntityState(state bool) ([]HassEntity, error) {
 	cfg, err := appconfig.GetConfig()
 	if err != nil {
 		log.Error(err.Error())
+
 		return []HassEntity{}, err
 	}
-	return SetEntityStateWithClient(&http.Client{}, cfg.HomeAssistantURL, cfg.HomeAssistantEntity, cfg.HomeAssistantToken, state)
+
+	return SetEntityStateWithClient(
+		&http.Client{},
+		cfg.HomeAssistantURL,
+		cfg.HomeAssistantEntity,
+		cfg.HomeAssistantToken,
+		state,
+	)
 }
 
 // SetEntityStateWithClient sets the state of a specific entity from Home Assistant using a custom HTTP client
@@ -149,9 +171,10 @@ func SetEntityStateWithClient(client HTTPClient, baseURL, entityID, token string
 		url = baseURL + "/api/services/switch/turn_off"
 	}
 
-	req, err := http.NewRequest("POST", url, nil)
+	req, err := http.NewRequest(http.MethodPost, url, nil)
 	if err != nil {
 		log.Error(err.Error())
+
 		return []HassEntity{}, err
 	}
 	if !state {
@@ -169,12 +192,14 @@ func SetEntityStateWithClient(client HTTPClient, baseURL, entityID, token string
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Error(err.Error())
+
 		return []HassEntity{}, err
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Error("Failed to read response body: " + err.Error())
+
 		return []HassEntity{}, err
 	}
 	defer resp.Body.Close()
@@ -183,15 +208,18 @@ func SetEntityStateWithClient(client HTTPClient, baseURL, entityID, token string
 	err = json.Unmarshal(body, &entities)
 	if err != nil {
 		log.Error("Failed to decode JSON response: " + err.Error())
+
 		return []HassEntity{}, err
 	}
 
 	for _, ent := range entities {
 		if ent.EntityID == entityID {
 			log.Info("Set entity state: " + entityID + " to " + ent.State)
+
 			break
 		}
 	}
+
 	return entities, nil
 }
 

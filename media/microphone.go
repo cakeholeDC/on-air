@@ -21,8 +21,10 @@ func GetMicrophoneState() bool {
 	if err != nil {
 		println("Error", "err", err)
 		log.Error("Error checking microphone state: " + err.Error())
+
 		return false
 	}
 	log.Debug("Microphone state is: " + strconv.FormatBool(isMicrophoneOn))
+
 	return isMicrophoneOn
 }

@@ -21,11 +21,12 @@ var toggleEntityFlag string = "toggle"
 var HassCmd = &cobra.Command{
 	Use:   "hass",
 	Short: "Home Assistant integration",
-	Long:  art.String("onair.hass") + "\nInteract with Home Assitant",
+	Long:  art.String("onair.hass") + "\nInteract with Home Assistant",
 	Run: func(cmd *cobra.Command, args []string) {
 		// if no flags, return the help menu.
 		if cmd.Flags().NFlag() == 0 {
 			cmd.Help()
+
 			return
 		}
 
@@ -39,9 +40,11 @@ var HassCmd = &cobra.Command{
 			cfg, err := appconfig.GetConfig()
 			if err != nil {
 				log.Error(err.Error())
+
 				return
 			}
 			hass.Health(client, cfg)
+
 			return
 		}
 
@@ -54,6 +57,7 @@ var HassCmd = &cobra.Command{
 				PrintOnAirASCII(entity.State)
 				entity.Print()
 			}
+
 			return
 		}
 
@@ -61,6 +65,7 @@ var HassCmd = &cobra.Command{
 			log.Debug("--toggle: Toggling Home Assistant entity...")
 			entity := hass.ToggleEntity()
 			PrintOnAirASCII(entity[0].State)
+
 			return
 		}
 	},

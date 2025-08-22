@@ -27,6 +27,7 @@ func (h *customHandler) Handle(_ context.Context, r slog.Record) error {
 	timestamp := r.Time.Format("2006/01/02 15:04:05")
 	level := r.Level.String()
 	fmt.Fprintf(logWriter, "%s [%s] %s %s\n", timestamp, h.module, level, r.Message)
+
 	return nil
 }
 
@@ -64,6 +65,7 @@ func readEnvLogPath() string {
 		userHomeDir, err := os.UserHomeDir()
 		if err != nil {
 			slog.Error(fmt.Sprintf("could not determine user home directory: %s", err))
+
 			return ""
 		}
 		envLogPath = fmt.Sprintf("%s/.config/onair/onair.log", userHomeDir)

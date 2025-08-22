@@ -66,6 +66,7 @@ func TestLoggerWritesToLogFile(t *testing.T) {
 		line := scanner.Text()
 		if strings.Contains(line, "[testmodule]") && strings.Contains(line, testMsg) {
 			found = true
+
 			break
 		}
 	}

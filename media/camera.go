@@ -23,8 +23,10 @@ func GetCameraState() bool {
 
 	if err != nil {
 		log.Error("Error checking camera state: " + err.Error())
+
 		return false
 	}
 	log.Debug("Camera state is: " + strconv.FormatBool(isCameraOn))
+
 	return isCameraOn
 }

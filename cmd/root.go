@@ -40,8 +40,7 @@ var checkFlag string = "status"
 var rootCmd = cobra.Command{
 	Use:   "onair",
 	Short: "onair is a command line tool to control home assistant entities",
-	// 	Long:  art.String("onair") + "\n\033[1monair\033[0m is a command line tool built in go to control Home Assistant entities. It is designed to be simple and easy to use, with a focus on controlling media devices.",
-	Long: art.String("onair") + about,
+	Long:  art.String("onair") + about,
 	Run: func(cmd *cobra.Command, args []string) {
 		if cmd.Flags().NFlag() == 0 {
 			// if the command is run without any flags and there is no configuration file present, show help
@@ -49,6 +48,7 @@ var rootCmd = cobra.Command{
 			if err != nil || cfg == nil {
 				cmd.Help()
 				red.Println("\nonair requires a configuration file. Run 'onair config --help' for more information.")
+
 				return
 			}
 			// otherwise, run in 'fast mode' - check if it should be on and act accordingly
@@ -61,6 +61,7 @@ var rootCmd = cobra.Command{
 				hass.SetEntityState(false)
 				hassCmd.PrintOnAirASCII("off")
 			}
+
 			return
 		}
 

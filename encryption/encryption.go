@@ -64,5 +64,6 @@ func IsEncrypted(input string) bool {
 	if err != nil {
 		return false
 	}
+
 	return len(decoded) >= aes.BlockSize
 }

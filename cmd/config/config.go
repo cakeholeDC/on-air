@@ -41,7 +41,12 @@ var audioFlag string = "enable-audio"
 var ConfigCmd = &cobra.Command{
 	Use:   "config",
 	Short: "Configure the application",
-	Long:  art.String("onair.cfg") + about + fmt.Sprintf("\nRun %s to create a configuration file.", code.Sprintf("onair config --%s", createFlag)),
+	Long: art.String("onair.cfg") +
+		about +
+		fmt.Sprintf(
+			"\nRun %s to create a configuration file.",
+			code.Sprintf("onair config --%s", createFlag),
+		),
 	Run: func(cmd *cobra.Command, args []string) {
 		// if no flags, return the help menu.
 		if cmd.Flags().NFlag() == 0 {
@@ -64,6 +69,7 @@ var ConfigCmd = &cobra.Command{
 			// warn if any other flags are used
 			if list || endpoint != "" || token != "" || device != "" || video != "" || audio != "" {
 				fmt.Println("The '--create' flag cannot be used with any other flags.")
+
 				return
 			}
 			// do not overwrite if the file exists.
@@ -71,9 +77,11 @@ var ConfigCmd = &cobra.Command{
 			if _, err := os.Stat(cfgPath); err == nil {
 				fmt.Printf("A configuration file already exists at: %s\n", green.Sprint(cfgPath))
 				fmt.Println("Aborting to avoid overwriting the existing file.")
+
 				return
 			} else if !os.IsNotExist(err) {
 				fmt.Printf("Error checking configuration file: %v\n", err)
+
 				return
 			}
 
@@ -81,6 +89,7 @@ var ConfigCmd = &cobra.Command{
 			cfg := appconfig.NewConfig()
 			cfg.Save(appconfig.ReadConfigPath())
 			fmt.Printf("Created a new configuration file at: %s\n", green.Sprint(appconfig.ReadConfigPath()))
+
 			return
 		}
 
@@ -89,7 +98,11 @@ var ConfigCmd = &cobra.Command{
 		if err != nil {
 			// fail if there is no config
 			log.Error(fmt.Sprintf("Error getting config: %s", err))
-			fmt.Printf("a configuration file is required for this application. please run %s for more info\n", code.Sprint("onair config --help"))
+			fmt.Printf(
+				"a configuration file is required for this application. please run %s for more info\n",
+				code.Sprint("onair config --help"),
+			)
+
 			return
 		}
 
@@ -97,6 +110,7 @@ var ConfigCmd = &cobra.Command{
 		if list {
 			log.Debug(fmt.Sprintf("--%s: Listing the current configuration", listFlag))
 			cfg.Print()
+
 			return
 		}
 		if endpoint != "" {
@@ -136,7 +150,9 @@ func printEnvVars() {
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	fmt.Fprintln(w, "ENV_VAR\tDEFAULT\tDESCRIPTION\t")
+	//nolint:lll
 	fmt.Fprintln(w, fmt.Sprintf("ONAIR_CONFIG_FILE_PATH\t%s/.config/onair/onair.cfg\t(optional) path to the config file", userHomeDir))
+	//nolint:lll
 	fmt.Fprintln(w, "ONAIR_CONFIG_ENCRYPTION_KEY\tnull\t(optional) key to encrypt/decrypt the config file")
 	w.Flush()
 }

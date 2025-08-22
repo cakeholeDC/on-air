@@ -33,6 +33,7 @@ func GetEnv(key, fallback string) string {
 	if value, exists := os.LookupEnv(key); exists {
 		return value
 	}
+
 	return fallback
 }
 
@@ -44,6 +45,7 @@ func GetTerminalSize() (int, int, error) {
 	if err != nil {
 		return 80, 24, err // Default size if unable to get terminal size
 	}
+
 	return termWidth, termHeight, nil
 }
 
@@ -75,8 +77,8 @@ func ReadFileBlob(filePath string) ([]byte, error) {
 		// did they give us a key?
 		if encryptionKey == "" {
 			// if the file is encrypted by there is no key, return an error
-			// TODO: log or return?
 			log.Error("File is encrypted but there is no ONAIR_CONFIG_ENCRYPTION_KEY")
+
 			return nil, fmt.Errorf("encryption key is not set in the environment variable ONAIR_CONFIG_ENCRYPTION_KEY")
 		}
 		// If the file is encrypted, decrypt it using the encryption key from the environment variable
@@ -91,6 +93,7 @@ func ReadFileBlob(filePath string) ([]byte, error) {
 		if encryptionKey != "" {
 			// TODO: log or return?
 			log.Warn("ONAIR_CONFIG_ENCRYPTION_KEY was provided but the file is not encrypted")
+
 			return nil, fmt.Errorf("ONAIR_CONFIG_ENCRYPTION_KEY was provided but the file is not encrypted")
 		}
 	}
@@ -106,6 +109,7 @@ func WriteFileBlob(filePath string, data []byte) error {
 		encryptedData, err := encryption.Encrypt(encryptionKey, string(data))
 		if err != nil {
 			fmt.Println("Error encrypting data:", err)
+
 			return fmt.Errorf("WriteFileBlob: %w", err)
 		}
 		data = []byte(encryptedData)

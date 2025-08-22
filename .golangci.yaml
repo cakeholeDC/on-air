@@ -1,0 +1,15 @@
+version: "2"
+
+linters:
+  default: fast # enables only linters considered as "fast" (`golangci-lint help linters --json | jq '[ .[] | select(.fast==true) ] | map(.name)'`).
+  # fix: true
+  disable:
+    - testpackage
+    - mnd
+    - wsl
+    - nolintlint
+    - godox # allows TODO/FIXME/BUG
+    - godot
+    - depguard
+    - gochecknoinits
+    

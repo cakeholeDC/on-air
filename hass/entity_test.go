@@ -125,6 +125,7 @@ func TestToggleEntity(t *testing.T) {
 	assert.Equal(t, "on", newState) // Should be "on" since we started with "off"
 }
 
+//nolint:funlen
 func TestSetEntityState(t *testing.T) {
 	// Track the current state - simulate state changes
 	currentState := "off"
