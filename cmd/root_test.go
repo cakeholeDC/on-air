@@ -35,7 +35,7 @@ func Test_GetHelp(t *testing.T) {
 	}
 
 	actual_output := string(out)
-	expected := "\033[1monair\033[0m is a command line tool"
+	expected := "onair is a command line tool"
 
 	if !strings.Contains(actual_output, expected) {
 		t.Fatalf("expected \"%s\" got \"%s\"", expected, actual_output)

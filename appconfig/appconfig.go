@@ -21,7 +21,7 @@ type AppConfig struct {
 var log = logger.New("config")
 
 func ReadConfigPath() string {
-	// Read the enviornment variable for the config file path
+	// Read the environment variable for the config file path
 	envConfigPath := os.Getenv("ONAIR_CONFIG_FILE_PATH")
 
 	// If the environment variable is not set, use the default path

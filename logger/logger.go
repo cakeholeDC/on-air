@@ -56,7 +56,7 @@ func New(module string) *slog.Logger {
 }
 
 func readEnvLogPath() string {
-	// Read the enviornment variable for the log file path
+	// Read the environment variable for the log file path
 	envLogPath := os.Getenv("ONAIR_LOG_FILEPATH")
 
 	// If the environment variable is not set, use the default path
