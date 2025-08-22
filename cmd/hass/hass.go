@@ -2,9 +2,13 @@ package hass
 
 import (
 	"github.com/cakeholeDC/on-air/hass"
+	"github.com/cakeholeDC/on-air/logger"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/zs5460/art"
 )
+
+var log = logger.New("hasscmd")
 
 var healthFlag string = "health"
 var getHassEntityFlag string = "entity"
@@ -32,14 +36,12 @@ var HassCmd = &cobra.Command{
 		}
 
 		if getHassEntity {
-			// client := hass.NewHTTPClient() // or construct as appropriate for your project
-			// fmt.Println("Listing devices...", client)
-			hass.GetEntity().Print()
+			log.Debug("--entity: Getting Home Assistant entity details...")
 			return
 		}
 
 		if toggleEntity {
-			hass.ToggleEntity()
+			log.Debug("--toggle: Toggling Home Assistant entity...")
 			return
 		}
 	},

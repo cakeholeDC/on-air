@@ -26,6 +26,7 @@ func NewHTTPClient() HTTPClient {
 }
 
 func Health(client HTTPClient) (HealthResponse, error) {
+	log.Info("Checking Home Assistant health...")
 	cfg, _ := appconfig.GetConfig()
 	req, err := http.NewRequest("GET", cfg.HomeAssistantURL+"/api/", nil)
 	if err != nil {

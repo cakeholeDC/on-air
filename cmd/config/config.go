@@ -6,9 +6,12 @@ import (
 	"text/tabwriter"
 
 	"github.com/cakeholeDC/on-air/appconfig"
+	"github.com/cakeholeDC/on-air/logger"
 	"github.com/spf13/cobra"
 	"github.com/zs5460/art"
 )
+
+var log = logger.New("configcmd")
 
 // TODO: think about the flag terminology.
 var listFlag string = "list"
@@ -43,22 +46,28 @@ var ConfigCmd = &cobra.Command{
 
 		// handle the flags
 		if list {
+			log.Debug("--list: Listing the current configuration")
 			cfg.Print()
 			return
 		}
 		if endpoint != "" {
+			log.Debug("--hass-endpoint: Setting Home Assistant endpoint to " + endpoint)
 			cfg.SetConfigValue("home_assistant_url", endpoint)
 		}
 		if token != "" {
+			log.Debug("--hass-token: Setting Home Assistant token to " + token)
 			cfg.SetConfigValue("home_assistant_token", token)
 		}
 		if device != "" {
+			log.Debug("--hass-entity: Setting Home Assistant entity to " + device)
 			cfg.SetConfigValue("home_assistant_entity", device)
 		}
 		if video != "" {
+			log.Debug("--enable-video: Setting video trigger to " + video)
 			cfg.SetConfigValue("onair_enable_camera", video)
 		}
 		if audio != "" {
+			log.Debug("--enable-audio: Setting audio trigger to " + audio)
 			cfg.SetConfigValue("onair_enable_microphone", audio)
 		}
 		// always print the config

@@ -79,6 +79,7 @@ func ToggleEntity() []HassEntity {
 }
 
 func ToggleEntityWithClient(client HTTPClient, baseURL, entityID, token string) []HassEntity {
+	log.Debug("Toggling entity: " + entityID)
 	req, err := http.NewRequest("POST", baseURL+"/api/services/homeassistant/toggle", nil)
 	req.Body = io.NopCloser(strings.NewReader(`{"entity_id": "` + entityID + `"}`))
 
@@ -112,5 +113,7 @@ func ToggleEntityWithClient(client HTTPClient, baseURL, entityID, token string) 
 		log.Error("Failed to decode JSON response: " + err.Error())
 		return []HassEntity{}
 	}
+
+	log.Debug("Toggled entity: " + entityID)
 	return entities
 }
