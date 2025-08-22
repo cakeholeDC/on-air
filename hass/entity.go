@@ -2,12 +2,14 @@ package hass
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
 
 	"github.com/cakeholeDC/on-air/appconfig"
 	"github.com/cakeholeDC/on-air/common"
+	"github.com/fatih/color"
 )
 
 type HassEntity struct {
@@ -116,4 +118,82 @@ func ToggleEntityWithClient(client HTTPClient, baseURL, entityID, token string) 
 
 	log.Debug("Toggled entity: " + entityID)
 	return entities
+}
+
+// Sets the entity's state to on or off (true/false)
+func SetEntityState(state bool) []HassEntity {
+	return SetEntityStateWithClient(&http.Client{}, cfg.HomeAssistantURL, cfg.HomeAssistantEntity, cfg.HomeAssistantToken, state)
+}
+
+// SetEntityStateWithClient sets the state of a specific entity from Home Assistant using a custom HTTP client
+func SetEntityStateWithClient(client HTTPClient, baseURL, entityID, token string, state bool) []HassEntity {
+	log.Info("Setting entity state: " + entityID + " to " + map[bool]string{true: "on", false: "off"}[state])
+
+	url := ""
+	if state {
+		url = baseURL + "/api/services/switch/turn_on"
+	} else {
+		url = baseURL + "/api/services/switch/turn_off"
+	}
+
+	req, err := http.NewRequest("POST", url, nil)
+	if err != nil {
+		log.Error(err.Error())
+		return []HassEntity{}
+	}
+	if !state {
+		req.Body = io.NopCloser(strings.NewReader(`{"entity_id": "` + entityID + `"}`))
+	} else {
+		req.Body = io.NopCloser(strings.NewReader(`{"entity_id": "` + entityID + `"}`))
+	}
+
+	header := http.Header{
+		"Authorization": []string{"Bearer " + token},
+		"Content-Type":  []string{"application/json"},
+	}
+	req.Header = header
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Error(err.Error())
+		return []HassEntity{}
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Error("Failed to read response body: " + err.Error())
+		return []HassEntity{}
+	}
+	defer resp.Body.Close()
+
+	var entities []HassEntity
+	err = json.Unmarshal(body, &entities)
+	if err != nil {
+		log.Error("Failed to decode JSON response: " + err.Error())
+		return []HassEntity{}
+	}
+
+	for _, ent := range entities {
+		if ent.EntityID == entityID {
+			log.Info("Set entity state: " + entityID + " to " + ent.State)
+			break
+		}
+	}
+	return entities
+}
+
+func (e HassEntity) PrintState() {
+	green := color.New(color.FgHiGreen)
+	red := color.New(color.FgHiRed)
+
+	// fmt.Printf("entity_id: %s\n", e.EntityID)
+	if e.State == "on" {
+		fmt.Printf("%s: ", e.EntityID)
+		green.Print("ON\n")
+	} else {
+		fmt.Printf("%s: ", e.EntityID)
+		red.Print("OFF\n")
+	}
+
+	log.Info(fmt.Sprintf("%s is: %s", e.EntityID, e.State))
 }

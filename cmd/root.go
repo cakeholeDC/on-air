@@ -1,10 +1,20 @@
 package cmd
 
+// TODO: ensure all this works
+// - onair		 	  checks if the light should be on, and acts accordingly
+// - onair --on 	  turns on the light
+// - onair --off 	  turns off the light
+// - onair --status   checks the status of the triggers and devices
+// - onair config ... manages configuration
+// - onair hass ...   interacts with home assistant directly
+
 import (
 	"fmt"
 
+	"github.com/cakeholeDC/on-air/appconfig"
 	"github.com/cakeholeDC/on-air/cmd/config"
-	"github.com/cakeholeDC/on-air/cmd/hass"
+	"github.com/cakeholeDC/on-air/cmd/hassCmd"
+	"github.com/cakeholeDC/on-air/hass"
 	"github.com/cakeholeDC/on-air/logger"
 	"github.com/cakeholeDC/on-air/media"
 	"github.com/spf13/cobra"
@@ -13,10 +23,50 @@ import (
 
 var log = logger.New("rootcmd")
 
+var onFlag string = "on"
+var offFlag string = "off"
+var checkFlag string = "status"
+
 var rootCmd = cobra.Command{
 	Use:   "onair",
 	Short: "onair is a command line tool to control Home Assistant entities",
 	Long:  art.String("onair") + "\n\033[1monair\033[0m is a command line tool built in go to control Home Assistant entities. It is designed to be simple and easy to use, with a focus on controlling media devices.",
+	Run: func(cmd *cobra.Command, args []string) {
+		if cmd.Flags().NFlag() == 0 {
+			// THIS MUST FAIL and return Help() if there is no config file
+			cfg, err := appconfig.GetConfig()
+			if err != nil || cfg == nil {
+				cmd.Help()
+				return
+			}
+			// TODO: implement "runner" where you invoke the binary and the light toggles if necessary
+			// DO THE THING
+			fmt.Println("Using config!")
+			return
+		}
+
+		turnOn, _ := cmd.Flags().GetBool(onFlag)
+		turnOff, _ := cmd.Flags().GetBool(offFlag)
+		check, _ := cmd.Flags().GetBool(checkFlag)
+
+		if turnOn {
+			log.Info("device turned ON manually")
+			hass.SetEntityState(true)
+			hassCmd.PrintOnAirASCII("on")
+		} else if turnOff {
+			log.Info("device turned OFF manually")
+			hass.SetEntityState(false)
+			hassCmd.PrintOnAirASCII("off")
+		} else if check {
+			log.Info("running status checks...")
+			media.PrintMediaStates()
+			entity := hass.GetEntity()
+			entity.PrintState()
+
+		} else {
+			log.Warn("No valid flag provided")
+		}
+	},
 }
 
 var checkCmd = &cobra.Command{
@@ -43,8 +93,12 @@ var checkCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(config.ConfigCmd)
-	rootCmd.AddCommand(hass.HassCmd)
+	rootCmd.AddCommand(hassCmd.HassCmd)
 	rootCmd.AddCommand(checkCmd)
+
+	rootCmd.PersistentFlags().BoolP(onFlag, "o", false, "Turn on the device")
+	rootCmd.PersistentFlags().BoolP(offFlag, "f", false, "Turn off the device")
+	rootCmd.PersistentFlags().BoolP(checkFlag, "c", false, "Check the status of the media triggers")
 }
 
 func Execute() {

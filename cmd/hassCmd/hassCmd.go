@@ -1,4 +1,4 @@
-package hass
+package hassCmd
 
 import (
 	"github.com/cakeholeDC/on-air/hass"
@@ -39,7 +39,7 @@ var HassCmd = &cobra.Command{
 		if getHassEntity {
 			log.Debug("--entity: Getting Home Assistant entity details...")
 			entity := hass.GetEntity()
-			printOnAirASCII(entity.State)
+			PrintOnAirASCII(entity.State)
 			entity.Print()
 			return
 		}
@@ -47,13 +47,13 @@ var HassCmd = &cobra.Command{
 		if toggleEntity {
 			log.Debug("--toggle: Toggling Home Assistant entity...")
 			entity := hass.ToggleEntity()
-			printOnAirASCII(entity[0].State)
+			PrintOnAirASCII(entity[0].State)
 			return
 		}
 	},
 }
 
-func printOnAirASCII(entityState string) {
+func PrintOnAirASCII(entityState string) {
 	if entityState == "on" {
 		green := color.New(color.FgHiGreen)
 		red := color.New(color.FgHiRed)

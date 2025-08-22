@@ -124,3 +124,108 @@ func TestToggleEntity(t *testing.T) {
 	assert.NotEqual(t, initialState, newState)
 	assert.Equal(t, "on", newState) // Should be "on" since we started with "off"
 }
+
+func TestSetEntityState(t *testing.T) {
+	// Track the current state - simulate state changes
+	currentState := "off"
+
+	// Create a test server that handles both service calls and state queries
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/services/switch/turn_on" {
+			// Handle turn_on service call
+			assert.Equal(t, "POST", r.Method)
+			assert.Equal(t, "Bearer test-token", r.Header.Get("Authorization"))
+
+			// Read and verify the request body
+			body, _ := io.ReadAll(r.Body)
+			assert.Contains(t, string(body), `"entity_id": "switch.mock"`)
+
+			// Change state to on
+			currentState = "on"
+
+			// Service calls typically return empty array
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`[]`))
+		} else if r.URL.Path == "/api/services/switch/turn_off" {
+			// Handle turn_off service call
+			assert.Equal(t, "POST", r.Method)
+			assert.Equal(t, "Bearer test-token", r.Header.Get("Authorization"))
+
+			// Read and verify the request body
+			body, _ := io.ReadAll(r.Body)
+			assert.Contains(t, string(body), `"entity_id": "switch.mock"`)
+
+			// Change state to off
+			currentState = "off"
+
+			// Service calls typically return empty array
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`[]`))
+		} else if r.URL.Path == "/api/states/switch.mock" {
+			// Handle state query
+			assert.Equal(t, "GET", r.Method)
+			assert.Equal(t, "Bearer test-token", r.Header.Get("Authorization"))
+
+			stateResponse := `{
+				"entity_id": "switch.mock",
+				"state": "` + currentState + `",
+				"attributes": {
+					"icon": "mdi:lightbulb",
+					"friendly_name": "mock switch"
+				},
+				"last_changed": "2023-01-01T12:00:00Z",
+				"last_updated": "2023-01-01T12:00:00Z",
+				"context": {
+					"id": "abc123",
+					"parent_id": null,
+					"user_id": "user123"
+				}
+			}`
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(stateResponse))
+		}
+	}))
+	defer server.Close()
+
+	// Create a mock HTTP client
+	client := &http.Client{}
+
+	// Test turning entity ON
+	t.Run("TurnOn", func(t *testing.T) {
+		// Reset to known state
+		currentState = "off"
+
+		// Get initial state
+		initialEntity := GetEntityWithClient(client, server.URL, "switch.mock", "test-token")
+		assert.Equal(t, "off", initialEntity.State)
+
+		// Call SetEntityState to turn on
+		SetEntityStateWithClient(client, server.URL, "switch.mock", "test-token", true)
+
+		// Verify state changed to on
+		updatedEntity := GetEntityWithClient(client, server.URL, "switch.mock", "test-token")
+		assert.Equal(t, "on", updatedEntity.State)
+		assert.Equal(t, "switch.mock", updatedEntity.EntityID)
+	})
+
+	// Test turning entity OFF
+	t.Run("TurnOff", func(t *testing.T) {
+		// Reset to known state
+		currentState = "on"
+
+		// Get initial state
+		initialEntity := GetEntityWithClient(client, server.URL, "switch.mock", "test-token")
+		assert.Equal(t, "on", initialEntity.State)
+
+		// Call SetEntityState to turn off
+		SetEntityStateWithClient(client, server.URL, "switch.mock", "test-token", false)
+
+		// Verify state changed to off
+		updatedEntity := GetEntityWithClient(client, server.URL, "switch.mock", "test-token")
+		assert.Equal(t, "off", updatedEntity.State)
+		assert.Equal(t, "switch.mock", updatedEntity.EntityID)
+	})
+}
