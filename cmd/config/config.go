@@ -21,8 +21,7 @@ var audioFlag string = "enable-audio"
 var ConfigCmd = &cobra.Command{
 	Use:   "config",
 	Short: "Configure the application",
-	// TODO: Add encryption
-	Long: art.String("onair.cfg") + "\nConfigure the application parameters such as the API endpoint, API key, and other settings.", //\n\nValues can encrypted on disk with the env vars 'IS_CFG_ENCRYPT' and 'CFG_CIPHER_KEY'",
+	Long:  art.String("onair.cfg") + "\nConfigure the application parameters such as the API endpoint, API key, and other settings.",
 	Run: func(cmd *cobra.Command, args []string) {
 		// if no flags, return the help menu.
 		if cmd.Flags().NFlag() == 0 {
