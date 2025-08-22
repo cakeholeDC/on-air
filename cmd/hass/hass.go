@@ -30,6 +30,7 @@ var HassCmd = &cobra.Command{
 		toggleEntity, _ := cmd.Flags().GetBool(toggleEntityFlag)
 
 		if health {
+			log.Debug("--health: Checking Home Assistant health status...")
 			client := hass.NewHTTPClient() // or construct as appropriate for your project
 			hass.Health(client)
 			return
@@ -37,14 +38,38 @@ var HassCmd = &cobra.Command{
 
 		if getHassEntity {
 			log.Debug("--entity: Getting Home Assistant entity details...")
+			entity := hass.GetEntity()
+			printOnAirASCII(entity.State)
+			entity.Print()
 			return
 		}
 
 		if toggleEntity {
 			log.Debug("--toggle: Toggling Home Assistant entity...")
+			entity := hass.ToggleEntity()
+			printOnAirASCII(entity[0].State)
 			return
 		}
 	},
+}
+
+func printOnAirASCII(entityState string) {
+	if entityState == "on" {
+		green := color.New(color.FgHiGreen)
+		red := color.New(color.FgHiRed)
+		green.Println("------------------")
+		green.Print("| --- ")
+		red.Print("ON AIR")
+		green.Print(" --- |\n")
+		green.Println("------------------")
+	} else {
+		gray := color.New(color.FgBlack)
+		gray.Println("------------------")
+		gray.Print("| --- ")
+		gray.Print("ON AIR")
+		gray.Print(" --- |\n")
+		gray.Println("------------------")
+	}
 }
 
 func init() {
