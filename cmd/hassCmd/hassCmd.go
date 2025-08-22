@@ -63,10 +63,11 @@ func PrintOnAirASCII(entityState string) {
 		green.Print(" --- |\n")
 		green.Println("------------------")
 	} else {
-		gray := color.New(color.FgBlack)
+		gray := color.New(color.FgHiBlack)
+		black := color.New(color.FgBlack)
 		gray.Println("------------------")
 		gray.Print("| --- ")
-		gray.Print("ON AIR")
+		black.Print("ON AIR")
 		gray.Print(" --- |\n")
 		gray.Println("------------------")
 	}
