@@ -41,7 +41,7 @@ func TestGetEntity(t *testing.T) {
 	client := &http.Client{}
 
 	// Call the function with our mock server URL and test credentials
-	entity := GetEntityWithClient(client, server.URL, "switch.mock", "test-token")
+	entity, _ := GetEntityWithClient(client, server.URL, "switch.mock", "test-token")
 
 	// Assert the response
 	assert.Equal(t, "switch.mock", entity.EntityID)
@@ -110,14 +110,14 @@ func TestToggleEntity(t *testing.T) {
 	client := &http.Client{}
 
 	// Get initial state
-	initialEntity := GetEntityWithClient(client, server.URL, "switch.mock", "test-token")
+	initialEntity, _ := GetEntityWithClient(client, server.URL, "switch.mock", "test-token")
 	initialState := initialEntity.State
 
 	// Call the toggle function
 	ToggleEntityWithClient(client, server.URL, "switch.mock", "test-token")
 
 	// Get the state after toggle
-	newEntity := GetEntityWithClient(client, server.URL, "switch.mock", "test-token")
+	newEntity, _ := GetEntityWithClient(client, server.URL, "switch.mock", "test-token")
 	newState := newEntity.State
 
 	// Assert the state has changed
@@ -199,14 +199,14 @@ func TestSetEntityState(t *testing.T) {
 		currentState = "off"
 
 		// Get initial state
-		initialEntity := GetEntityWithClient(client, server.URL, "switch.mock", "test-token")
+		initialEntity, _ := GetEntityWithClient(client, server.URL, "switch.mock", "test-token")
 		assert.Equal(t, "off", initialEntity.State)
 
 		// Call SetEntityState to turn on
 		SetEntityStateWithClient(client, server.URL, "switch.mock", "test-token", true)
 
 		// Verify state changed to on
-		updatedEntity := GetEntityWithClient(client, server.URL, "switch.mock", "test-token")
+		updatedEntity, _ := GetEntityWithClient(client, server.URL, "switch.mock", "test-token")
 		assert.Equal(t, "on", updatedEntity.State)
 		assert.Equal(t, "switch.mock", updatedEntity.EntityID)
 	})
@@ -217,14 +217,14 @@ func TestSetEntityState(t *testing.T) {
 		currentState = "on"
 
 		// Get initial state
-		initialEntity := GetEntityWithClient(client, server.URL, "switch.mock", "test-token")
+		initialEntity, _ := GetEntityWithClient(client, server.URL, "switch.mock", "test-token")
 		assert.Equal(t, "on", initialEntity.State)
 
 		// Call SetEntityState to turn off
 		SetEntityStateWithClient(client, server.URL, "switch.mock", "test-token", false)
 
 		// Verify state changed to off
-		updatedEntity := GetEntityWithClient(client, server.URL, "switch.mock", "test-token")
+		updatedEntity, _ := GetEntityWithClient(client, server.URL, "switch.mock", "test-token")
 		assert.Equal(t, "off", updatedEntity.State)
 		assert.Equal(t, "switch.mock", updatedEntity.EntityID)
 	})
