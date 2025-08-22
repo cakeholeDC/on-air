@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+
+env:
+  CGO_ENABLED: 1
+
 jobs:
   golang-test:
     strategy:
