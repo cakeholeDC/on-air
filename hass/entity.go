@@ -29,23 +29,26 @@ type HassEntity struct {
 	} `json:"context"`
 }
 
-var cfg, _ = appconfig.GetConfig()
-
 func (e HassEntity) Print() {
 	common.PrintYAML(e)
 }
 
 // GetEntity retrieves the state of a specific entity from Home Assistant
-func GetEntity() HassEntity {
+func GetEntity() (HassEntity, error) {
+	cfg, err := appconfig.GetConfig()
+	if err != nil {
+		log.Error(err.Error())
+		return HassEntity{}, err
+	}
 	return GetEntityWithClient(&http.Client{}, cfg.HomeAssistantURL, cfg.HomeAssistantEntity, cfg.HomeAssistantToken)
 }
 
 // GetEntityWithClient retrieves the state of a specific entity from Home Assistant using a custom HTTP client
-func GetEntityWithClient(client HTTPClient, baseURL, entityID, token string) HassEntity {
+func GetEntityWithClient(client HTTPClient, baseURL, entityID, token string) (HassEntity, error) {
 	req, err := http.NewRequest("GET", baseURL+"/api/states/"+entityID, nil)
 	if err != nil {
 		log.Error(err.Error())
-		return HassEntity{}
+		return HassEntity{}, err
 	}
 
 	header := http.Header{
@@ -57,13 +60,13 @@ func GetEntityWithClient(client HTTPClient, baseURL, entityID, token string) Has
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Error(err.Error())
-		return HassEntity{}
+		return HassEntity{}, err
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Error("Failed to read response body: " + err.Error())
-		return HassEntity{}
+		return HassEntity{}, err
 	}
 	defer resp.Body.Close()
 
@@ -71,12 +74,17 @@ func GetEntityWithClient(client HTTPClient, baseURL, entityID, token string) Has
 	err = json.Unmarshal(body, &entity)
 	if err != nil {
 		log.Error("Failed to decode JSON response: " + err.Error())
-		return HassEntity{}
+		return HassEntity{}, err
 	}
-	return entity
+	return entity, nil
 }
 
 func ToggleEntity() []HassEntity {
+	cfg, err := appconfig.GetConfig()
+	if err != nil {
+		log.Error(err.Error())
+		return []HassEntity{}
+	}
 	return ToggleEntityWithClient(&http.Client{}, cfg.HomeAssistantURL, cfg.HomeAssistantEntity, cfg.HomeAssistantToken)
 }
 
@@ -121,12 +129,17 @@ func ToggleEntityWithClient(client HTTPClient, baseURL, entityID, token string) 
 }
 
 // Sets the entity's state to on or off (true/false)
-func SetEntityState(state bool) []HassEntity {
+func SetEntityState(state bool) ([]HassEntity, error) {
+	cfg, err := appconfig.GetConfig()
+	if err != nil {
+		log.Error(err.Error())
+		return []HassEntity{}, err
+	}
 	return SetEntityStateWithClient(&http.Client{}, cfg.HomeAssistantURL, cfg.HomeAssistantEntity, cfg.HomeAssistantToken, state)
 }
 
 // SetEntityStateWithClient sets the state of a specific entity from Home Assistant using a custom HTTP client
-func SetEntityStateWithClient(client HTTPClient, baseURL, entityID, token string, state bool) []HassEntity {
+func SetEntityStateWithClient(client HTTPClient, baseURL, entityID, token string, state bool) ([]HassEntity, error) {
 	log.Info("Setting entity state: " + entityID + " to " + map[bool]string{true: "on", false: "off"}[state])
 
 	url := ""
@@ -139,7 +152,7 @@ func SetEntityStateWithClient(client HTTPClient, baseURL, entityID, token string
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
 		log.Error(err.Error())
-		return []HassEntity{}
+		return []HassEntity{}, err
 	}
 	if !state {
 		req.Body = io.NopCloser(strings.NewReader(`{"entity_id": "` + entityID + `"}`))
@@ -156,13 +169,13 @@ func SetEntityStateWithClient(client HTTPClient, baseURL, entityID, token string
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Error(err.Error())
-		return []HassEntity{}
+		return []HassEntity{}, err
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Error("Failed to read response body: " + err.Error())
-		return []HassEntity{}
+		return []HassEntity{}, err
 	}
 	defer resp.Body.Close()
 
@@ -170,7 +183,7 @@ func SetEntityStateWithClient(client HTTPClient, baseURL, entityID, token string
 	err = json.Unmarshal(body, &entities)
 	if err != nil {
 		log.Error("Failed to decode JSON response: " + err.Error())
-		return []HassEntity{}
+		return []HassEntity{}, err
 	}
 
 	for _, ent := range entities {
@@ -179,7 +192,7 @@ func SetEntityStateWithClient(client HTTPClient, baseURL, entityID, token string
 			break
 		}
 	}
-	return entities
+	return entities, nil
 }
 
 func (e HassEntity) PrintState() {

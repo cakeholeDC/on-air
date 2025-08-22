@@ -30,7 +30,7 @@ func setupTestEnv(t *testing.T) {
 func TestReadConfigPath(t *testing.T) {
 	setupTestEnv(t)
 	// Tests that the config file path is read correctly from the environment variable
-	cfgPath := readConfigPath()
+	cfgPath := ReadConfigPath()
 	assert.Equal(t, TEST_CONFIG_FILE, cfgPath, fmt.Sprintf("Expected config file path to be '%s'", TEST_CONFIG_FILE))
 }
 
@@ -57,4 +57,3 @@ func TestSetConfigValue(t *testing.T) {
 	assert.Equal(t, "test.com", cfg.HomeAssistantURL, "Expected home_assistant_url to be 'test.com'")
 	assert.Equal(t, true, cfg.OnairEnableCamera, "Expected onair_enable_camera to be 'true'")
 }
-

@@ -1,6 +1,8 @@
 package hassCmd
 
 import (
+	"fmt"
+
 	"github.com/cakeholeDC/on-air/hass"
 	"github.com/cakeholeDC/on-air/logger"
 	"github.com/fatih/color"
@@ -9,6 +11,7 @@ import (
 )
 
 var log = logger.New("hasscmd")
+var red = color.New(color.FgRed).Add(color.Bold)
 
 var healthFlag string = "health"
 var getHassEntityFlag string = "entity"
@@ -38,9 +41,13 @@ var HassCmd = &cobra.Command{
 
 		if getHassEntity {
 			log.Debug("--entity: Getting Home Assistant entity details...")
-			entity := hass.GetEntity()
-			PrintOnAirASCII(entity.State)
-			entity.Print()
+			entity, err := hass.GetEntity()
+			if err != nil {
+				fmt.Printf("Failed to get entity state: %s\n", red.Sprint(err))
+			} else {
+				PrintOnAirASCII(entity.State)
+				entity.Print()
+			}
 			return
 		}
 

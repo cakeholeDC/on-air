@@ -20,7 +20,7 @@ type AppConfig struct {
 
 var log = logger.New("config")
 
-func readConfigPath() string {
+func ReadConfigPath() string {
 	// Read the enviornment variable for the config file path
 	envConfigPath := os.Getenv("ONAIR_CONFIG_FILE_PATH")
 
@@ -43,40 +43,31 @@ func (c *AppConfig) Print() {
 	fmt.Println(strings.Repeat("*", termWidth))
 	common.PrintArtStringIfFits(modName)
 	fmt.Println(strings.Repeat("*", termWidth))
-	fmt.Printf("Configuration File: %s\n", readConfigPath())
+	fmt.Printf("Configuration File: %s\n", ReadConfigPath())
 	fmt.Println(strings.Repeat("*", termWidth))
 	common.PrintYAML(c)
 }
 
+func NewConfig() *AppConfig {
+	return &AppConfig{}
+}
+
 func GetConfig() (*AppConfig, error) {
-	cfgPath := readConfigPath()
-	// create a new config struct
-	c := &AppConfig{}
-	// read the file from disk
+	// read the env variable.
+	cfgPath := ReadConfigPath()
+
+	// using the env var, read the file from disk
 	log.Debug(fmt.Sprintf("reading config: %s", cfgPath))
 	data, err := common.ReadFileBlob(cfgPath)
 
 	// check if the file exists
 	if err != nil {
-		// if the file is not found, create a new config file
-		if strings.Contains(err.Error(), "no such file") {
-			// log the action
-			log.Info("Config file does not exist.")
-			log.Info(fmt.Sprintf("Creating config file: %s", cfgPath))
-			// print for the user
-			fmt.Println("Config file does not exist.")
-			fmt.Printf("Creating config file: %s\n", cfgPath)
-			// write the empty config to the file
-			err := c.Save(cfgPath)
-			if err != nil {
-				log.Error(fmt.Sprintf("Error creating config file: %s", err))
-			}
-			return c, nil
-		} else {
-			log.Error(fmt.Sprintf("Error reading config file: %s", err))
-			return nil, err
-		}
+		log.Error(fmt.Sprintf("Error reading config file: %s", err))
+		return nil, err
 	}
+
+	// create a new config struct
+	c := &AppConfig{}
 
 	// parse the config into a struct
 	err = yaml.Unmarshal(data, &c)
@@ -113,7 +104,7 @@ func (c *AppConfig) SetConfigValue(key string, value string) {
 		return
 	}
 
-	c.Save(readConfigPath())
+	c.Save(ReadConfigPath())
 }
 
 func (c *AppConfig) Save(filePath string) error {

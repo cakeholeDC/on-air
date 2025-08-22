@@ -6,6 +6,11 @@ import (
 	"github.com/fatih/color"
 )
 
+func ShouldBeOn() bool {
+	// returns true if ANY media device is enabled.
+	return GetCameraState() || GetMicrophoneState()
+}
+
 func PrintMediaStates() {
 	// Print the current states of media devices
 	cameraState := GetCameraState()
