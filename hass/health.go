@@ -25,16 +25,18 @@ func NewHTTPClient() HTTPClient {
 	return &http.Client{}
 }
 
-func Health(client HTTPClient) (HealthResponse, error) {
+func Health(client HTTPClient, config *appconfig.AppConfig) (HealthResponse, error) {
 	log.Info("Checking Home Assistant health...")
-	cfg, _ := appconfig.GetConfig()
-	req, err := http.NewRequest("GET", cfg.HomeAssistantURL+"/api/", nil)
+	// cfg, _ := appconfig.GetConfig()
+	// req, err := http.NewRequest("GET", cfg.HomeAssistantURL+"/api/", nil)
+	req, err := http.NewRequest("GET", config.HomeAssistantURL+"/api/", nil)
 	if err != nil {
 		log.Error(err.Error())
 	}
 
 	header := http.Header{
-		"Authorization": []string{"Bearer " + cfg.HomeAssistantToken},
+		// "Authorization": []string{"Bearer " + cfg.HomeAssistantToken},
+		"Authorization": []string{"Bearer " + config.HomeAssistantToken},
 		"Content-Type":  []string{"application/json"},
 	}
 	req.Header = header

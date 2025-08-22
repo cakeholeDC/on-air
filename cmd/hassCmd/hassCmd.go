@@ -3,6 +3,7 @@ package hassCmd
 import (
 	"fmt"
 
+	"github.com/cakeholeDC/on-air/appconfig"
 	"github.com/cakeholeDC/on-air/hass"
 	"github.com/cakeholeDC/on-air/logger"
 	"github.com/fatih/color"
@@ -35,7 +36,12 @@ var HassCmd = &cobra.Command{
 		if health {
 			log.Debug("--health: Checking Home Assistant health status...")
 			client := hass.NewHTTPClient() // or construct as appropriate for your project
-			hass.Health(client)
+			cfg, err := appconfig.GetConfig()
+			if err != nil {
+				log.Error(err.Error())
+				return
+			}
+			hass.Health(client, cfg)
 			return
 		}
 

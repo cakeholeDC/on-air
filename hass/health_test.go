@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/cakeholeDC/on-air/appconfig"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -22,6 +23,10 @@ func (m *MockClient) Do(req *http.Request) (*http.Response, error) {
 
 func TestHealth(t *testing.T) {
 	mockClient := new(MockClient)
+	mockConfig := &appconfig.AppConfig{
+		HomeAssistantURL:   "http://localhost:8123",
+		HomeAssistantToken: "test_token",
+	}
 
 	// Mock response body
 	mockResponse := `{"message": "API Running."}`
@@ -34,7 +39,7 @@ func TestHealth(t *testing.T) {
 	mockClient.On("Do", mock.Anything).Return(resp, nil)
 
 	// Call the Health function with the mock client
-	healthResp, err := Health(mockClient)
+	healthResp, err := Health(mockClient, mockConfig)
 
 	// Assert the returned HealthResponse
 	assert.NoError(t, err)
