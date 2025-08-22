@@ -38,3 +38,5 @@ jobs:
       #----------------------------------------------
       - name: 🧪 Run Go Tests
         uses: robherley/go-test-action@v0
+        with:
+          testArguments: -v ./...
