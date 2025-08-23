@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/cakeholeDC/on-air/common"
+	"github.com/cakeholeDC/on-air/constants"
 	"github.com/cakeholeDC/on-air/logger"
 	"gopkg.in/yaml.v2"
 )
@@ -32,7 +33,12 @@ func ReadConfigPath() string {
 
 			return ""
 		}
-		envConfigPath = fmt.Sprintf("%s/.config/onair/onair.cfg", userHomeDir)
+		envConfigPath = fmt.Sprintf(
+			"%s/%s/%s",
+			userHomeDir,
+			constants.ONAIR_DEFAULT_HOME_APP_DATA_SUFFIX,
+			constants.ONAIR_DEFAULT_CONFIG_FILENAME,
+		)
 	}
 	// return the config file path
 	return envConfigPath

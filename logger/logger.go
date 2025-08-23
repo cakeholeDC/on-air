@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/cakeholeDC/on-air/constants"
 	"github.com/natefinch/lumberjack"
 )
 
@@ -68,7 +69,12 @@ func readEnvLogPath() string {
 
 			return ""
 		}
-		envLogPath = fmt.Sprintf("%s/.config/onair/onair.log", userHomeDir)
+		envLogPath = fmt.Sprintf(
+			"%s/%s/%s",
+			userHomeDir,
+			constants.ONAIR_DEFAULT_HOME_APP_DATA_SUFFIX,
+			constants.ONAIR_DEFAULT_LOG_FILENAME,
+		)
 	}
 	// return the log file path
 	return envLogPath
