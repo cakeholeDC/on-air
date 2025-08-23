@@ -2,7 +2,8 @@
 
 CORE
 - ✅ Hook up run logic for should light be on. `onair` => default cfg => do the thing.
-- Constants
+- ✅ Constants
+- Keygen: randomly generate a file.key in app_data. Default env var points here. Preserve ability to overwrite key with env var.
 
 UX
 - What does a new user do first? WIll they need a readme, or will the binary have a good enough ux?
@@ -31,7 +32,7 @@ With this change, we can then invoke the binary `onair` with no sub commands or 
 
 That way, if there's no config, running `onair` will fail with a message that **"configuration is required for this application. please `run onair config --create`"** to create one.
 
-- Currently, the app would require two config files to control two devices. Can we strucure the yaml config in such a way that more than one device can be configured? Consider a structure as follows:
+- Currently, the app would require two config files to control two devices. Can we structure the yaml config in such a way that more than one device can be configured? Consider a structure as follows:
 
 ```yaml
 # api
