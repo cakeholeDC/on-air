@@ -50,3 +50,35 @@ Run `onair config` to see the config options.
 ## Service
 
 ## Service
+
+## Launch Daemon
+
+Schedule onair to run using launch daemon.
+
+The file `local.onair.plist` contains an interval in seconds:
+```
+    <key>StartInterval</key>
+    <integer>30</integer>
+    <key>RunAtLoad</key>
+```
+
+Set this value to your desired interval.
+
+Then run `make launchd-load` to load the service.
+
+If you want to load the service at the top of the next minute to ensure your interval aligns with the minute, run `make launchd-interval`
+
+Run `make launchd-unload` to remove the launch daemon.
+
+## Run Binary as sudo without password:
+```sh
+sudo visudo
+```
+
+Find the section for "root and users in group wheel can run anything on any machine as any user" and add the following below the line: `%admin          ALL = (ALL) ALL`
+
+```txt
+%admin          ALL = (ALL) NOPASSWD: /usr/local/bin/onair
+```
+
+This will allow all admins to execute the binary without a password.
