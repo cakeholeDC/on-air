@@ -159,11 +159,11 @@ func printEnvVars() {
 }
 
 func init() {
-	ConfigCmd.PersistentFlags().Bool(createFlag, false, "Create a new configuration file")
-	ConfigCmd.PersistentFlags().Bool(listFlag, false, "List the current configuration")
-	ConfigCmd.PersistentFlags().String(endpointFlag, "", "Set the HASS endpoint url")
-	ConfigCmd.PersistentFlags().String(tokenFlag, "", "Set the HASS API token")
-	ConfigCmd.PersistentFlags().String(entityFlag, "", "Set the HASS entity name")
-	ConfigCmd.PersistentFlags().String(videoFlag, "", "Enable the video trigger")
-	ConfigCmd.PersistentFlags().String(audioFlag, "", "Enable the audio trigger")
+	ConfigCmd.PersistentFlags().BoolP(createFlag, "n", false, "Create a new configuration file")
+	ConfigCmd.PersistentFlags().BoolP(listFlag, "l", false, "List the current configuration")
+	ConfigCmd.PersistentFlags().StringP(endpointFlag, "e", "", "Set the HASS endpoint url")
+	ConfigCmd.PersistentFlags().StringP(tokenFlag, "t", "", "Set the HASS API token")
+	ConfigCmd.PersistentFlags().StringP(entityFlag, "d", "", "Set the HASS entity name")
+	ConfigCmd.PersistentFlags().StringP(videoFlag, "v", "", "Enable the video trigger")
+	ConfigCmd.PersistentFlags().StringP(audioFlag, "a", "", "Enable the audio trigger")
 }
