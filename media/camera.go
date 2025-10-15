@@ -4,12 +4,16 @@ import (
 	"strconv"
 
 	mediaDevices "github.com/cakeholeDC/go-media-devices-state"
-	"github.com/cakeholeDC/on-air/logger"
+	"github.com/cakeholeDC/on-air/appconfig"
 )
 
-var log = logger.New("media")
-
 func GetCameraState() bool {
+	cfg, _ := appconfig.GetConfig()
+	if !cfg.OnairEnableCamera {
+		log.Debug("Camera service is disabled in config.")
+		return false
+	}
+
 	log.Debug("Checking camera state...")
 	var isCameraOn bool
 	var err error

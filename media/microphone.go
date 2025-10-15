@@ -4,9 +4,16 @@ import (
 	"strconv"
 
 	mediaDevices "github.com/cakeholeDC/go-media-devices-state"
+	"github.com/cakeholeDC/on-air/appconfig"
 )
 
 func GetMicrophoneState() bool {
+	cfg, _ := appconfig.GetConfig()
+	if !cfg.OnairEnableMicrophone {
+		log.Debug("Microphone service is disabled in config.")
+		return false
+	}
+
 	log.Debug("Checking microphone state...")
 	var isMicrophoneOn bool
 	var err error

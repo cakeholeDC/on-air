@@ -142,7 +142,6 @@ func ToggleEntityWithClient(client HTTPClient, baseURL, entityID, token string) 
 	return entities
 }
 
-// Sets the entity's state to on or off (true/false)
 func SetEntityState(state bool) ([]HassEntity, error) {
 	cfg, err := appconfig.GetConfig()
 	if err != nil {

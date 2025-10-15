@@ -3,8 +3,12 @@ package media
 import (
 	"fmt"
 
+	"github.com/cakeholeDC/on-air/appconfig"
+	"github.com/cakeholeDC/on-air/logger"
 	"github.com/fatih/color"
 )
+
+var log = logger.New("media")
 
 func ShouldBeOn() bool {
 	// returns true if ANY media device is enabled.
@@ -12,27 +16,37 @@ func ShouldBeOn() bool {
 }
 
 func PrintMediaStates() {
-	// Print the current states of media devices
-	cameraState := GetCameraState()
-	microphoneState := GetMicrophoneState()
-
 	green := color.New(color.FgHiGreen)
 	red := color.New(color.FgHiRed)
 
-	if cameraState {
-		fmt.Print("video: ")
-		green.Print("ON\n")
+	cfg, _ := appconfig.GetConfig()
+
+	if cfg.OnairEnableCamera {
+		cameraState := GetCameraState()
+		if cameraState {
+			fmt.Print("video: ")
+			green.Print("ON\n")
+		} else {
+			fmt.Print("video: ")
+			red.Print("OFF\n")
+		}
 	} else {
 		fmt.Print("video: ")
-		red.Print("OFF\n")
+		red.Print("SERVICE DISABLED\n")
 	}
 
-	if microphoneState {
-		fmt.Print("audio: ")
-		green.Print("ON\n")
+	if cfg.OnairEnableMicrophone {
+		microphoneState := GetMicrophoneState()
+		if microphoneState {
+			fmt.Print("audio: ")
+			green.Print("ON\n")
+		} else {
+			fmt.Print("audio: ")
+			red.Print("OFF\n")
+		}
 	} else {
 		fmt.Print("audio: ")
-		red.Print("OFF\n")
+		red.Print("SERVICE DISABLED\n")
 	}
 }
 
