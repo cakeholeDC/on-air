@@ -11,6 +11,7 @@ func GetMicrophoneState() bool {
 	cfg, _ := appconfig.GetConfig()
 	if !cfg.OnairEnableMicrophone {
 		log.Debug("Microphone service is disabled in config.")
+
 		return false
 	}
 
