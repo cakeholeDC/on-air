@@ -70,7 +70,7 @@ var rootCmd = cobra.Command{
 		check, _ := cmd.Flags().GetBool(checkFlag)
 
 		if turnOn {
-			log.Info("device turned ON manually")
+			log.Info(fmt.Sprintf("--%s => device turned ON manually", onFlag))
 			_, err := hass.SetEntityState(true)
 			if err == nil {
 				hassCmd.PrintOnAirASCII("on")
@@ -78,7 +78,7 @@ var rootCmd = cobra.Command{
 				fmt.Printf("Failed to turn on the device: %s\n", red.Sprint(err))
 			}
 		} else if turnOff {
-			log.Info("device turned OFF manually")
+			log.Info(fmt.Sprintf("--%s => device turned OFF manually", offFlag))
 			_, err := hass.SetEntityState(false)
 			if err == nil {
 				hassCmd.PrintOnAirASCII("off")
@@ -86,7 +86,7 @@ var rootCmd = cobra.Command{
 				fmt.Printf("Failed to turn off the device: %s\n", red.Sprint(err))
 			}
 		} else if check {
-			log.Info("running status checks...")
+			log.Info(fmt.Sprintf("--%s => running status checks...", checkFlag))
 			media.PrintMediaStates()
 			entity, err := hass.GetEntity()
 			if err != nil {
@@ -100,32 +100,9 @@ var rootCmd = cobra.Command{
 	},
 }
 
-var checkCmd = &cobra.Command{
-	Use:   "check",
-	Short: "Run onair checks",
-	Long:  art.String("onair.check") + "\nRun onair checks",
-	Run: func(cmd *cobra.Command, args []string) {
-		log.Debug("--check: Running onair checks")
-		// fmt.Println("Running onair checks...")
-		cameraState := media.GetCameraState()
-		microphoneState := media.GetMicrophoneState()
-		// fmt.Printf("Camera state: %s\n", strconv.FormatBool(cameraState))
-		// fmt.Printf("Microphone state: %s\n", strconv.FormatBool(microphoneState))
-
-		if cameraState || microphoneState {
-			fmt.Println("At least one media device is active.")
-			// TURN ON DEVICE
-		} else {
-			fmt.Println("No media devices are active.")
-			// TURN OFF DEVICE
-		}
-	},
-}
-
 func init() {
 	rootCmd.AddCommand(config.ConfigCmd)
 	rootCmd.AddCommand(hassCmd.HassCmd)
-	rootCmd.AddCommand(checkCmd)
 
 	rootCmd.PersistentFlags().BoolP(onFlag, "o", false, "Turn on the device")
 	rootCmd.PersistentFlags().BoolP(offFlag, "f", false, "Turn off the device")
