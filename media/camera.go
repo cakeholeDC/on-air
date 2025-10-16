@@ -10,7 +10,7 @@ import (
 func GetCameraState() bool {
 	cfg, _ := appconfig.GetConfig()
 	if !cfg.OnairEnableCamera {
-		log.Debug("Camera service is disabled in config.")
+		log.Info("Camera service is disabled.")
 
 		return false
 	}
