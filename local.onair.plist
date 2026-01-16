@@ -6,12 +6,13 @@
     <string>local.onair</string>
     <key>ProgramArguments</key>
     <array>
-        <string>sudo</string>
-        <string>/usr/local/bin/onair</string>
+        <string>!HOME!/.local/bin/onair</string>
     </array>
     <key>StartInterval</key>
     <integer>30</integer>
     <key>RunAtLoad</key>
     <true/>
+    <key>UserName</key>
+    <string>!USER!</string>
 </dict>
 </plist>
