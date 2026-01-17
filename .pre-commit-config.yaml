@@ -16,7 +16,7 @@
 # https://github.com/mpnunez/pybind11-conan-example/blob/a259bfe9bd99ded80f4bf16ce7c639e140f26408/.pre-commit-config.yaml
 repos:
   - repo: https://github.com/golangci/golangci-lint
-    rev: v2.4.0 # Use the appropriate version
+    rev: v2.8.0 # Use the appropriate version
     hooks:
       - id: golangci-lint
         # name: go lint and format
@@ -26,3 +26,7 @@ repos:
       - id: check-yaml
 #     -   id: end-of-file-fixer
 #     -   id: trailing-whitespace
+  - repo: https://github.com/koalaman/shellcheck-precommit
+    rev: v0.11.0
+    hooks:
+      - id: shellcheck
