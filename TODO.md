@@ -51,6 +51,5 @@ home_assistant_entities:
 ```
 
 CLEANUP
-- remove python code entirely
 - setup release actions
 - improve go test coverage

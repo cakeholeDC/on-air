@@ -5,11 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
-            "type": "python",
+            "name": "Debug Package",
+            "type": "go",
             "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal"
-        }
+            "mode": "debug",
+            "program": "${workspaceFolder}"
+        },
+        {
+            "name": "Debug Current File",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${file}"
+        },
     ]
 }

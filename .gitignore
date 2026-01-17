@@ -1,9 +1,7 @@
 .env
-.venv/
 .cache.*
 *.log
 *.log.*
-**__pycache__**
 
 # config
 onair.cfg
