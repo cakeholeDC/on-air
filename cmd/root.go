@@ -52,7 +52,6 @@ var rootCmd = cobra.Command{
 				return
 			}
 			// otherwise, run in 'fast mode' - check if it should be on and act accordingly
-			//? TODO: should fast mode be configurable?
 			shouldBeOn := media.ShouldBeOn()
 			if shouldBeOn {
 				hass.SetEntityState(true)
@@ -93,6 +92,7 @@ var rootCmd = cobra.Command{
 				fmt.Printf("Failed to get entity state: %s\n", red.Sprint(err))
 			} else {
 				entity.PrintState()
+				hass.PrintCache()
 			}
 		} else {
 			log.Warn("No valid flag provided")
@@ -106,7 +106,12 @@ func init() {
 
 	rootCmd.PersistentFlags().BoolP(onFlag, "o", false, "Turn on the device")
 	rootCmd.PersistentFlags().BoolP(offFlag, "f", false, "Turn off the device")
-	rootCmd.PersistentFlags().BoolP(checkFlag, "c", false, "Check the status of the media triggers")
+	rootCmd.PersistentFlags().BoolP(
+		checkFlag,
+		"c",
+		false,
+		"Check the status of the media triggers and the device. Queries for current state.",
+	)
 }
 
 func Execute() {

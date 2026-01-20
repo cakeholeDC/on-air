@@ -138,25 +138,46 @@ func ToggleEntityWithClient(client HTTPClient, baseURL, entityID, token string) 
 	}
 
 	log.Debug("Toggled entity: " + entityID)
+	writeCache(entities[0].State == "on")
 
 	return entities
 }
 
 func SetEntityState(state bool) ([]HassEntity, error) {
-	cfg, err := appconfig.GetConfig()
+	// read the cache to see the last known state
+	cacheState, err := readCache()
 	if err != nil {
-		log.Error(err.Error())
-
-		return []HassEntity{}, err
+		log.Error(fmt.Sprintf("failed to read cache: %s", err))
 	}
+	fmt.Println(cacheState)
 
-	return SetEntityStateWithClient(
-		&http.Client{},
-		cfg.HomeAssistantURL,
-		cfg.HomeAssistantEntity,
-		cfg.HomeAssistantToken,
-		state,
-	)
+	// if the desired state matches the cached state, do nothing
+	if cacheState == state {
+		fmt.Printf("already %t\n", state)
+		log.Info("Entity state is already " +
+			map[bool]string{true: "on", false: "off"}[state] +
+			" according to cache; no action taken")
+
+		return []HassEntity{}, nil
+	} else {
+		// otherwise, set the state and rewrite the cache
+		fmt.Printf("changing to %t\n", state)
+		cfg, err := appconfig.GetConfig()
+		if err != nil {
+			log.Error(err.Error())
+
+			return []HassEntity{}, err
+		}
+
+		// sets the state and rewrites the cache
+		return SetEntityStateWithClient(
+			&http.Client{},
+			cfg.HomeAssistantURL,
+			cfg.HomeAssistantEntity,
+			cfg.HomeAssistantToken,
+			state,
+		)
+	}
 }
 
 // SetEntityStateWithClient sets the state of a specific entity from Home Assistant using a custom HTTP client
@@ -214,11 +235,12 @@ func SetEntityStateWithClient(client HTTPClient, baseURL, entityID, token string
 	for _, ent := range entities {
 		if ent.EntityID == entityID {
 			log.Info("Set entity state: " + entityID + " to " + ent.State)
-
 			break
 		}
 	}
 
+	// write the new state to the cache
+	writeCache(state)
 	return entities, nil
 }
 
@@ -226,12 +248,10 @@ func (e HassEntity) PrintState() {
 	green := color.New(color.FgHiGreen)
 	red := color.New(color.FgHiRed)
 
-	// fmt.Printf("entity_id: %s\n", e.EntityID)
+	fmt.Printf("%s: ", e.EntityID)
 	if e.State == "on" {
-		fmt.Printf("%s: ", e.EntityID)
 		green.Print("ON\n")
 	} else {
-		fmt.Printf("%s: ", e.EntityID)
 		red.Print("OFF\n")
 	}
 
