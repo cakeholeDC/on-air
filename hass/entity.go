@@ -235,12 +235,14 @@ func SetEntityStateWithClient(client HTTPClient, baseURL, entityID, token string
 	for _, ent := range entities {
 		if ent.EntityID == entityID {
 			log.Info("Set entity state: " + entityID + " to " + ent.State)
+
 			break
 		}
 	}
 
 	// write the new state to the cache
 	writeCache(state)
+
 	return entities, nil
 }
 
