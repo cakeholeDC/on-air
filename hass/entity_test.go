@@ -4,12 +4,68 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"testing"
 
+	"github.com/cakeholeDC/on-air/constants"
 	"github.com/stretchr/testify/assert"
 )
 
+func setupTestEnv(t *testing.T) func() {
+	t.Helper()
+
+	// Create a temporary directory for testing
+	tmpDir, err := os.MkdirTemp("", "onair-entity-test-*")
+	if err != nil {
+		t.Fatalf("Failed to create temp dir: %v", err)
+	}
+
+	// Store original home dir and config path
+	originalHome, _ := os.UserHomeDir()
+	originalConfigPath := os.Getenv("ONAIR_CONFIG_FILE_PATH")
+
+	// Set HOME to temp directory
+	os.Setenv("HOME", tmpDir)
+
+	// Create the config directory structure
+	configDir := filepath.Join(tmpDir, constants.ONAIR_DEFAULT_HOME_APP_DATA_SUFFIX)
+	err = os.MkdirAll(configDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create config dir: %v", err)
+	}
+
+	// Create a temporary config file with test entity
+	configFile, err := os.CreateTemp(configDir, "onair-test-config-*.cfg")
+	if err != nil {
+		t.Fatalf("Failed to create temp config file: %v", err)
+	}
+
+	// Write minimal config with entity name for testing
+	configContent := []byte("home_assistant_entity: switch.mock\n")
+	if err := os.WriteFile(configFile.Name(), configContent, 0644); err != nil {
+		t.Fatalf("Failed to write test config: %v", err)
+	}
+
+	// Set config path environment variable
+	os.Setenv("ONAIR_CONFIG_FILE_PATH", configFile.Name())
+
+	// Return cleanup function
+	return func() {
+		os.Setenv("HOME", originalHome)
+		if originalConfigPath != "" {
+			os.Setenv("ONAIR_CONFIG_FILE_PATH", originalConfigPath)
+		} else {
+			os.Unsetenv("ONAIR_CONFIG_FILE_PATH")
+		}
+		os.RemoveAll(tmpDir)
+	}
+}
+
 func TestGetEntity(t *testing.T) {
+	cleanup := setupTestEnv(t)
+	defer cleanup()
+
 	// Mock Home Assistant API response
 	mockResponse := `{
 		"entity_id": "switch.mock",
@@ -53,8 +109,8 @@ func TestGetEntity(t *testing.T) {
 }
 
 func TestToggleEntity(t *testing.T) {
-	// Mock Home Assistant API response for toggle service
-	mockResponse := `[]` // Toggle service typically returns an empty array
+	cleanup := setupTestEnv(t)
+	defer cleanup()
 
 	// Track the current state - simulate a toggle behavior
 	currentState := "off"
@@ -76,6 +132,25 @@ func TestToggleEntity(t *testing.T) {
 			} else {
 				currentState = "off"
 			}
+
+			// Return array with the toggled entity state
+			mockResponse := `[
+				{
+					"entity_id": "switch.mock",
+					"state": "` + currentState + `",
+					"attributes": {
+						"icon": "mdi:lightbulb",
+						"friendly_name": "mock switch"
+					},
+					"last_changed": "2023-01-01T12:00:00Z",
+					"last_updated": "2023-01-01T12:00:00Z",
+					"context": {
+						"id": "abc123",
+						"parent_id": null,
+						"user_id": "user123"
+					}
+				}
+			]`
 
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
@@ -127,6 +202,9 @@ func TestToggleEntity(t *testing.T) {
 
 //nolint:funlen
 func TestSetEntityState(t *testing.T) {
+	cleanup := setupTestEnv(t)
+	defer cleanup()
+
 	// Track the current state - simulate state changes
 	currentState := "off"
 

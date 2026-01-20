@@ -22,29 +22,25 @@ func PrintMediaStates() {
 	cfg, _ := appconfig.GetConfig()
 
 	cameraState := GetCameraState()
+	fmt.Print("video: ")
 	if !cfg.OnairEnableCamera {
-		fmt.Print("video: ")
 		red.Print("SERVICE DISABLED\n")
 	} else {
 		if cameraState {
-			fmt.Print("video: ")
 			green.Print("ON\n")
 		} else {
-			fmt.Print("video: ")
 			red.Print("OFF\n")
 		}
 	}
 
 	microphoneState := GetMicrophoneState()
+	fmt.Print("audio: ")
 	if !cfg.OnairEnableMicrophone {
-		fmt.Print("audio: ")
 		red.Print("SERVICE DISABLED\n")
 	} else {
 		if microphoneState {
-			fmt.Print("audio: ")
 			green.Print("ON\n")
 		} else {
-			fmt.Print("audio: ")
 			red.Print("OFF\n")
 		}
 	}
