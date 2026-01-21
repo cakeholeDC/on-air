@@ -3,6 +3,7 @@ package hass
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/cakeholeDC/on-air/appconfig"
 	"github.com/cakeholeDC/on-air/constants"
@@ -44,15 +45,16 @@ func readCache() (bool, error) {
 	}
 
 	log.Info("reading cache from " + cachePath)
-	data, err := os.ReadFile(cachePath)
+	rawData, err := os.ReadFile(cachePath)
 	if err != nil {
 		// assume off if no cache
 		return false, nil
 	}
+	data := strings.TrimSpace(string(rawData))
 
-	log.Debug("cache data: " + string(data))
+	log.Debug("cache data: " + data)
 	log.Info("cache read successfully")
-	if string(data) == "true" {
+	if data == "true" {
 		return true, nil
 	} else {
 		return false, nil
@@ -68,9 +70,9 @@ func writeCache(state bool) error {
 
 	log.Info("writing cache to " + cachePath)
 	log.Debug("cache value: " + fmt.Sprintf("%t", state))
-	data := "false"
+	data := "false\n"
 	if state {
-		data = "true"
+		data = "true\n"
 	}
 	err = os.WriteFile(cachePath, []byte(data), 0644)
 	if err != nil {

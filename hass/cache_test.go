@@ -3,6 +3,7 @@ package hass
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/cakeholeDC/on-air/constants"
@@ -186,7 +187,7 @@ func TestWriteCache_True(t *testing.T) {
 		t.Fatalf("Failed to read cache file: %v", err)
 	}
 
-	if string(data) != "true" {
+	if strings.TrimSpace(string(data)) != "true" {
 		t.Errorf("Cache file content = %v, want 'true'", string(data))
 	}
 }
@@ -210,7 +211,7 @@ func TestWriteCache_False(t *testing.T) {
 		t.Fatalf("Failed to read cache file: %v", err)
 	}
 
-	if string(data) != "false" {
+	if strings.TrimSpace(string(data)) != "false" {
 		t.Errorf("Cache file content = %v, want 'false'", string(data))
 	}
 }
