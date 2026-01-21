@@ -149,11 +149,9 @@ func SetEntityState(state bool) ([]HassEntity, error) {
 	if err != nil {
 		log.Error(fmt.Sprintf("failed to read cache: %s", err))
 	}
-	fmt.Println(cacheState)
 
 	// if the desired state matches the cached state, do nothing
 	if cacheState == state {
-		fmt.Printf("already %t\n", state)
 		log.Info("Entity state is already " +
 			map[bool]string{true: "on", false: "off"}[state] +
 			" according to cache; no action taken")
@@ -161,7 +159,6 @@ func SetEntityState(state bool) ([]HassEntity, error) {
 		return []HassEntity{}, nil
 	} else {
 		// otherwise, set the state and rewrite the cache
-		fmt.Printf("changing to %t\n", state)
 		cfg, err := appconfig.GetConfig()
 		if err != nil {
 			log.Error(err.Error())
