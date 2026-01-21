@@ -14,6 +14,14 @@ This app can be deployed as a User Agent (launchd LaunchAgent) to run on an inte
 - [Home Assistant](https://www.home-assistant.io/) => with a compatible [device](https://www.home-assistant.io/integrations/) (light, outlet, or switch recommended)
 
 ## Getting Started
+1. Add `$HOME/.local/bin/` to your $PATH
+    ```sh
+    # zsh
+    echo "export PATH=\"\$PATH:$HOME/.local/bin\"" >> "$HOME/.zshrc"
+
+    # bash
+    echo "export PATH=\"\$PATH:$HOME/.local/bin\"" >> "$HOME/.bashrc"
+    ```
 1. Checkout the repo and build the binary:
     ```sh
     make build
