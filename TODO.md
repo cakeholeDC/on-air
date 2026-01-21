@@ -1,7 +1,6 @@
 # TODO
 
 CORE
-- Move app_data dir to $HOME/.onair
 - Keygen: randomly generate a file.key in app_data. Default env var points here. Preserve ability to overwrite key with env var.
 - Allow for a time interval. M-F between 9-17
     - This can be done via cron, but macos local network access might be difficult.
