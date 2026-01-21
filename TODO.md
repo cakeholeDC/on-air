@@ -20,6 +20,9 @@ MEDIA
     - How should this work?
 - maybe: update media package c++ dependencies
 
+CI/CD
+- Do we need to run on MacOS anymore?
+
 CONFIG
 - Encrypt by default
 - Currently, the app would require two config files to control two devices. Can we structure the yaml config in such a way that more than one device can be configured? Consider a structure as follows:
