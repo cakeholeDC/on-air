@@ -3,10 +3,9 @@
 CORE
 - Keygen: randomly generate a file.key in app_data. Default env var points here. Preserve ability to overwrite key with env var.
 - Allow for a time interval. M-F between 9-17
-    - This can be done via cron, but macos local network access might be difficult.
-    - Launchd `StartCalendarInterval` - will require a specific schedule to be defined. 9:01, 9:02, 9:03 etc
-    - A wrapper script. How will this behave with macos local network access
-    - config - perhaps the best approach. add a config value for schedule, use CRONTAB syntax. Enforce in the binary.
+    - config - add a config value for schedule, use CRONTAB syntax. Enforce in the binary.
+    - How do I turn the light on/off outside of the scheduled window. Currently onair -o and onair -f will check the time to see if actions can be performed, and then not.
+        - Should -o and -f override the cache? Shuold the cache only apply when run as `onair`? - what if we just removed the cache? That assumes false...
 
 HASS
 - Endpoint to list all devices by entity_id; CMD to access

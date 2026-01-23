@@ -70,6 +70,7 @@ ONAIR_CONFIG_FILE_PATH=$HOME/.onair/device-b.cfg onair
 | home_assistant_entity   | string   | Home Assistant (HASS) entity name           |
 | onair_enable_camera     | boolean  | Enable camera detection (true/false)        |
 | onair_enable_microphone | boolean  | Enable microphone detection (true/false)    |
+| scheduler_cron_interval | string   | (optional) cron scheduler for user agent ("* * * * *") |
 
 
 #### Encryption
@@ -120,6 +121,30 @@ You will need to allow the binary to access devices on your local network.
 When the following pop-up appears, click allow.
 
 ![Allow local network access prompt](./images/local-network-access.png)
+
+#### Scheduler
+The user agent allows **onair** to run on an interval, such as every 30 seconds. Sometimes, the desired behavior is to only have the this interval apply during certain time windows, like during the workday (MON-FRI between 9am-5pm).
+
+<!-- TODO: CONFIG VALUE NAME! -->
+This can be accomplished with the optional config value of `scheduler_cron_interval`. With a schedule set, the agent will still run on it's fixed interval. At runtime, it evaluates this cron-style schedule to determine whether work is allowed at that time.
+
+The schedule does not control execution frequency; it defines _time windows during which the agent may perform actions_. On each wake-up, the agent checks whether the current time falls within an allowed window and either proceeds or exits.
+
+Using the above workday example, the config value would be as follows:
+```cron
+# Every minute during business hours (9:00 AM - 4:59 PM)
+# Monday through Friday
+
+# every minute (*)
+# of hours 9 AM through 4 PM (9-16)
+# on every day of the month (*)
+# every month (*)
+# on day of week MON-FRI (1-5)
+
+scheduler_cron_interval="* 9-16 * * 1-5"
+```
+
+> Need help with cron scheduling? Check out [crontab.guru](https://crontab.guru) or [crontab.cronhub.io](https://crontab.cronhub.io)
 
 ### Environment Variables
 | service | env var | type | default |

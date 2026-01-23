@@ -8,6 +8,7 @@ import (
 	"github.com/cakeholeDC/on-air/appconfig"
 	"github.com/cakeholeDC/on-air/constants"
 	"github.com/cakeholeDC/on-air/logger"
+	"github.com/cakeholeDC/on-air/schedule"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/zs5460/art"
@@ -28,6 +29,9 @@ A configuration file is required to store application secrets and settings.
 - hass-endpoint [URL of the Home Assistant instance]
 - hass-token [API token for Home Assistant]
 - hass-entity [Entity ID to control]
+
+# Optional Settings
+- scheduler-cron-interval [Cron expression for scheduling checks, default: "* * * * *"]
 `
 
 // TODO: think about the flag terminology.
@@ -38,6 +42,7 @@ var tokenFlag string = "hass-token"
 var entityFlag string = "hass-entity"
 var videoFlag string = "enable-video"
 var audioFlag string = "enable-audio"
+var scheduleFlag string = "schedule"
 
 var ConfigCmd = &cobra.Command{
 	Use:   "config",
@@ -64,6 +69,7 @@ var ConfigCmd = &cobra.Command{
 		device, _ := cmd.Flags().GetString(entityFlag)
 		video, _ := cmd.Flags().GetString(videoFlag)
 		audio, _ := cmd.Flags().GetString(audioFlag)
+		cronString, _ := cmd.Flags().GetString(scheduleFlag)
 
 		// if create, don't check the config yet.
 		if create {
@@ -134,6 +140,17 @@ var ConfigCmd = &cobra.Command{
 			log.Debug(fmt.Sprintf("--%s: Setting audio trigger to %s", audioFlag, audio))
 			cfg.SetConfigValue("onair_enable_microphone", audio)
 		}
+		if cronString != "" {
+			// validate that schedule is wrapped in quotes
+			if _, err := schedule.NewSchedule(cronString); err != nil {
+				fmt.Printf("Error: invalid cron expression: %v\n", err)
+				fmt.Println("Example: onair config -s \"* 9-16 * * 1-5\"")
+
+				return
+			}
+			log.Debug(fmt.Sprintf("--%s: Setting scheduler cron interval to %s", scheduleFlag, cronString))
+			cfg.SetConfigValue("scheduler_cron_interval", cronString)
+		}
 		// always print the config
 		cfg.Print()
 	},
@@ -166,4 +183,5 @@ func init() {
 	ConfigCmd.PersistentFlags().StringP(entityFlag, "d", "", "Set the HASS entity name")
 	ConfigCmd.PersistentFlags().StringP(videoFlag, "v", "", "Enable the video trigger")
 	ConfigCmd.PersistentFlags().StringP(audioFlag, "a", "", "Enable the audio trigger")
+	ConfigCmd.PersistentFlags().StringP(scheduleFlag, "s", "", "(optional) Set the user agent schedule")
 }

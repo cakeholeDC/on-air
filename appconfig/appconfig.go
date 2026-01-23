@@ -17,6 +17,8 @@ type AppConfig struct {
 	HomeAssistantEntity   string `yaml:"home_assistant_entity"`
 	OnairEnableCamera     bool   `yaml:"onair_enable_camera"`
 	OnairEnableMicrophone bool   `yaml:"onair_enable_microphone"`
+	// TODO: consider whether we need the default or not.
+	SchedulerCronInterval string `default:"* * * * *" yaml:"scheduler_cron_interval"`
 }
 
 var log = logger.New("config")
@@ -43,7 +45,6 @@ func ReadConfigPath() string {
 	// return the config file path
 	return envConfigPath
 }
-
 
 func NewConfig() *AppConfig {
 	return &AppConfig{}
@@ -92,6 +93,8 @@ func GetConfig() (*AppConfig, error) {
 func (c *AppConfig) SetConfigValue(key string, value string) {
 	log.Info(fmt.Sprintf("setting config: %s=%s", key, value))
 	switch key {
+	case "scheduler_cron_interval":
+		c.SchedulerCronInterval = value
 	case "home_assistant_url":
 		c.HomeAssistantURL = value
 	case "home_assistant_token":

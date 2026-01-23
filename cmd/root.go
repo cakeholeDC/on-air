@@ -10,6 +10,7 @@ package cmd
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/cakeholeDC/on-air/appconfig"
 	"github.com/cakeholeDC/on-air/cmd/config"
@@ -17,6 +18,7 @@ import (
 	"github.com/cakeholeDC/on-air/hass"
 	"github.com/cakeholeDC/on-air/logger"
 	"github.com/cakeholeDC/on-air/media"
+	"github.com/cakeholeDC/on-air/schedule"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/zs5460/art"
@@ -51,6 +53,19 @@ var rootCmd = cobra.Command{
 
 				return
 			}
+
+			scheduler, _ := schedule.NewSchedule(cfg.SchedulerCronInterval)
+			if !scheduler.CanRun() {
+				log.Info("Current time is outside of the scheduled interval. Exiting.")
+				fmt.Printf(
+					"Current time (%s) is outside of the scheduled interval (%s). Exiting.\n",
+					time.Now().Format("03:04:05 PM"),
+					cfg.SchedulerCronInterval,
+				)
+
+				return
+			}
+
 			// otherwise, run in 'fast mode' - check if it should be on and act accordingly
 			shouldBeOn := media.ShouldBeOn()
 			if shouldBeOn {
@@ -115,12 +130,5 @@ func init() {
 }
 
 func Execute() {
-	// TODO: implement "fast mode" where you invoke the binary and the light toggles
-	fastMode := false
-	if !fastMode {
-		rootCmd.Execute()
-	} else {
-		log.Debug("Fast mode enabled, skipping help output")
-		// do the thing
-	}
+	rootCmd.Execute()
 }
