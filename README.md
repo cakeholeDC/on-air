@@ -17,10 +17,10 @@ This app can be deployed as a User Agent (launchd LaunchAgent) to run on an inte
 1. Add `$HOME/.local/bin/` to your $PATH
     ```sh
     # zsh
-    echo "export PATH=\"\$PATH:$HOME/.local/bin\"" >> "$HOME/.zshrc"
+    echo "export PATH=\"\$PATH:$HOME/.local/bin\"" >> "$HOME/.zprofle"
 
     # bash
-    echo "export PATH=\"\$PATH:$HOME/.local/bin\"" >> "$HOME/.bashrc"
+    echo "export PATH=\"\$PATH:$HOME/.local/bin\"" >> "$HOME/.bash_profile"
     ```
 1. Checkout the repo and build the binary:
     ```sh
@@ -32,7 +32,7 @@ This app can be deployed as a User Agent (launchd LaunchAgent) to run on an inte
     ```
 1. Set your home assistant config values
     ```sh
-    onair config -e $HASS_ENDPOINT -t $HASS_TOKEN -d $HASS_DEVICE
+    onair config -e "$HASS_ENDPOINT" -t "$HASS_TOKEN" -d "$HASS_DEVICE"
     ```
 1. Check the status
     ```sh
@@ -52,15 +52,17 @@ This app can be deployed as a User Agent (launchd LaunchAgent) to run on an inte
 
 The configuration file holds values for interfacing with Home Assistant, as well as configuration settings for what triggers the actions.
 
-The default path for the config file is `$HOME/.config/onair/onair.cfg`
+The default path for the config file is `$HOME/.onair/onair.cfg`
 
 To specify a configuration file, set the environment variable `ONAIR_CONFIG_FILE_PATH` at runtime.
 
 You can have multiple config files. Why would you want more than one config file? Let's say that you want two devices to turn on under different circumstances? Configuration files are 1:1 with IoT devices, so each device would require it's own config file. Below is an example:
 
 ```bash
-ONAIR_CONFIG_FILE_PATH=$HOME/.onair/device-a.cfg onair
-ONAIR_CONFIG_FILE_PATH=$HOME/.onair/device-b.cfg onair
+# Turn on device a
+ONAIR_CONFIG_FILE_PATH=$HOME/.onair/device-a.cfg onair -o
+# Turn off device b
+ONAIR_CONFIG_FILE_PATH=$HOME/.onair/device-b.cfg onair -f
 ```
 
 | VALUE                   | TYPE     | DESCRIPTION                                 |
@@ -149,11 +151,11 @@ scheduler_cron_interval="* 9-16 * * 1-5"
 ### Environment Variables
 | service | env var | type | default |
 |---------|---------|------|---------|
-| config  | `ONAIR_CONFIG_FILE_PATH` | string(Path) | `$HOME/.config/onair/onair.cfg` |
+| config  | `ONAIR_CONFIG_FILE_PATH` | string(Path) | `$HOME/.onair/onair.cfg` |
 | config  | `ONAIR_CONFIG_ENCRYPTION_KEY` | string(16, 24, or 32 bytes) | null |
-| logger  | `ONAIR_LOG_FILEPATH` | string(path) |  `$HOME/.config/onair/onair.log` |
+| logger  | `ONAIR_LOG_FILEPATH` | string(path) |  `$HOME/.onair/onair.log` |
 
 ### Logging
-**onair** logs to `$HOME/.config/onair/onair.cfg`.
+**onair** writes log files to `$HOME/.onair/onair.log`. The logs self-rotate, and auto cleanup after enough time passes.
 
 The log location can be changed with the `ONAIR_LOG_FILEPATH` env var.
