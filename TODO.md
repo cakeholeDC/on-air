@@ -2,10 +2,6 @@
 
 CORE
 - Keygen: randomly generate a file.key in app_data. Default env var points here. Preserve ability to overwrite key with env var.
-- Allow for a time interval. M-F between 9-17
-    - config - add a config value for schedule, use CRONTAB syntax. Enforce in the binary.
-    - How do I turn the light on/off outside of the scheduled window. Currently onair -o and onair -f will check the time to see if actions can be performed, and then not.
-        - Should -o and -f override the cache? Shuold the cache only apply when run as `onair`? - what if we just removed the cache? That assumes false...
 
 HASS
 - Endpoint to list all devices by entity_id; CMD to access
@@ -13,8 +9,7 @@ HASS
 - Rebuild Hass server.
 
 MEDIA
-- What if the light is turned on manually? How do we prevent the next scheduled check from turning it off?
-    - Consider a cache/lock file to cache the light state.
+- Consider a lock file to turn the light on for N time.
     - How should this work?
 - maybe: update media package c++ dependencies
 
