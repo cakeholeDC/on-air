@@ -1,0 +1,54 @@
+name: Semantic Pull Request Check
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+    branches:
+      - main
+      - stage
+
+jobs:
+  main:
+    name: Validate PR Title
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    steps:
+      - uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Configure which types are allowed (must be lowercase)
+          types: |
+            fix
+            feat
+            chore
+            refactor
+          # Configure which scopes are allowed (must be lowercase)
+          scopes: |
+            build
+            ci
+            core
+            docs
+            test
+            hass
+            config
+          # Require a scope to be provided
+          requireScope: false
+          # Ensure types and scopes are lowercase
+          subjectPattern: ^(?![A-Z]).+$
+          subjectPatternError: |
+            The subject "{subject}" found in the pull request title "{title}"
+            didn't match the configured pattern. Please ensure that the subject
+            doesn't start with an uppercase character.
+          # Validate the entire PR title
+          validateSingleCommit: false
+          # Validate the entire title matches conventional commit format
+          # Example valid titles:
+          # - fix(core): resolve crash on startup
+          # - feat(hass): add new integration
+          # - chore(ci): update workflows
