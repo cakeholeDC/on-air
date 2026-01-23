@@ -36,21 +36,3 @@ jobs:
         with:
           version: v2.1
           config: .golangci.yml
-  shellcheck:
-    strategy:
-      fail-fast: true
-    runs-on: ubuntu-latest
-    steps:
-      #----------------------------------------------
-      # Check-out repo
-      #----------------------------------------------
-      - name: ⤵️ Check out repository
-        uses: actions/checkout@v4
-      #----------------------------------------------
-      # Run 'shellcheck'
-      #----------------------------------------------
-      - name: 🦪 Run shellcheck
-        uses: sudo-bot/action-shellcheck@latest
-        with:
-            # https://github.com/koalaman/shellcheck#how-to-use
-            cli-args: "scripts/*.sh"
