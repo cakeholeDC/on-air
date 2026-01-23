@@ -69,10 +69,10 @@ var rootCmd = cobra.Command{
 			// otherwise, run in 'fast mode' - check if it should be on and act accordingly
 			shouldBeOn := media.ShouldBeOn()
 			if shouldBeOn {
-				hass.SetEntityState(true)
+				hass.SetEntityState(true, false)
 				hassCmd.PrintOnAirASCII("on")
 			} else {
-				hass.SetEntityState(false)
+				hass.SetEntityState(false, false)
 				hassCmd.PrintOnAirASCII("off")
 			}
 
@@ -85,7 +85,8 @@ var rootCmd = cobra.Command{
 
 		if turnOn {
 			log.Info(fmt.Sprintf("--%s => device turned ON manually", onFlag))
-			_, err := hass.SetEntityState(true)
+			// Manual state changes skip the cache check to force the action
+			_, err := hass.SetEntityState(true, true)
 			if err == nil {
 				hassCmd.PrintOnAirASCII("on")
 			} else {
@@ -93,7 +94,8 @@ var rootCmd = cobra.Command{
 			}
 		} else if turnOff {
 			log.Info(fmt.Sprintf("--%s => device turned OFF manually", offFlag))
-			_, err := hass.SetEntityState(false)
+			// Manual state changes skip the cache check to force the action
+			_, err := hass.SetEntityState(false, true)
 			if err == nil {
 				hassCmd.PrintOnAirASCII("off")
 			} else {

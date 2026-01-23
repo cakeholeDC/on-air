@@ -143,38 +143,38 @@ func ToggleEntityWithClient(client HTTPClient, baseURL, entityID, token string) 
 	return entities
 }
 
-func SetEntityState(state bool) ([]HassEntity, error) {
+func SetEntityState(state bool, skipCache bool) ([]HassEntity, error) {
 	// read the cache to see the last known state
 	cacheState, err := readCache()
 	if err != nil {
 		log.Error(fmt.Sprintf("failed to read cache: %s", err))
 	}
 
-	// if the desired state matches the cached state, do nothing
-	if cacheState == state {
+	// if the desired state matches the cached state, do nothing (unless skipCache is true)
+	if !skipCache && cacheState == state {
 		log.Info("Entity state is already " +
 			map[bool]string{true: "on", false: "off"}[state] +
 			" according to cache; no action taken")
 
 		return []HassEntity{}, nil
-	} else {
-		// otherwise, set the state and rewrite the cache
-		cfg, err := appconfig.GetConfig()
-		if err != nil {
-			log.Error(err.Error())
-
-			return []HassEntity{}, err
-		}
-
-		// sets the state and rewrites the cache
-		return SetEntityStateWithClient(
-			&http.Client{},
-			cfg.HomeAssistantURL,
-			cfg.HomeAssistantEntity,
-			cfg.HomeAssistantToken,
-			state,
-		)
 	}
+
+	// otherwise, set the state and rewrite the cache
+	cfg, err := appconfig.GetConfig()
+	if err != nil {
+		log.Error(err.Error())
+
+		return []HassEntity{}, err
+	}
+
+	// sets the state and rewrites the cache
+	return SetEntityStateWithClient(
+		&http.Client{},
+		cfg.HomeAssistantURL,
+		cfg.HomeAssistantEntity,
+		cfg.HomeAssistantToken,
+		state,
+	)
 }
 
 // SetEntityStateWithClient sets the state of a specific entity from Home Assistant using a custom HTTP client
