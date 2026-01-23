@@ -97,6 +97,19 @@ Add the `home_assistant_url`, `home_assistant_token`, and `home_assistant_entity
 
 Once configured, run `onair hass` to see hass options.
 
+#### Cache
+**onair** utilizes a local device state cache. The state cache ensures that the HASS server is not sent unnecessary requests (such as `OFF... OFF... OFF...` or `ON... ON... ON...`).
+
+When the application runs it first determines if the home assistant entity `shouldBeOn` by checking the media device state. Before sending the `shouldBeOn` state to Home Assistant, it checks the cache to see if `entityIsOn`. 
+
+If `entityIsOn == shouldBeOn` (true==true or false==false), no requests are sent. If `entityIsOn != shouldBeOn` (true!=false) then the request is sent to Home Assistant to change the entity state.  When a request is sent, the cache is updated accordingly.
+
+Cache files are stored in `$HOME/.onair/` with the filename of `$ENTITY_NAME + ".cache"`. There will be one cache file per HASS entity.
+
+You can check the cache value with the `onair -c (or onair --status)` command.
+
+The cache also allows the entity to be manually controlled, say via Home Assistant directly, without **onair** constantly overriding a the state.
+
 ### User Agent
 
 Schedule **onair** to run as a user agent.
