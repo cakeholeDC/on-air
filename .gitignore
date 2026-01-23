@@ -1,6 +1,13 @@
 .env
-.venv/
 .cache.*
+*.cache.*
+*.cache
 *.log
 *.log.*
-**__pycache__**
+
+# config
+onair.cfg
+
+# compiled binary
+onair
+on-air

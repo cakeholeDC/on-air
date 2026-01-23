@@ -1,0 +1,38 @@
+name: Static Analysis
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - main
+  
+permissions:
+  contents: read
+
+jobs:
+  golang-lint:
+    strategy:
+      fail-fast: true
+    runs-on: ubuntu-latest
+    steps:
+      #----------------------------------------------
+      # Check-out repo
+      #----------------------------------------------
+      - name: ⤵️ Check out repository
+        uses: actions/checkout@v4
+      #----------------------------------------------
+      # Setup Go
+      #----------------------------------------------
+      - name: 🛠️ Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      #----------------------------------------------
+      # Run golangci-lint
+      #----------------------------------------------
+      - name: 🧹 Run golangci-lint
+        uses: golangci/golangci-lint-action@v8
+        with:
+          version: v2.1
+          config: .golangci.yml

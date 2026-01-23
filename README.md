@@ -1,150 +1,174 @@
-# ON AIR 🎙️🚨
-![test-and-lint](https://github.com/cakeholeDC/on-air/actions/workflows/test-and-lint.yml/badge.svg)
+# ONAIR 🎙️🚨
+![static-analysis](https://github.com/cakeholeDC/on-air/actions/workflows/static-analysis.yml/badge.svg)
+![unit-tests](https://github.com/cakeholeDC/on-air/actions/workflows/unit-test.yml/badge.svg)
 
-ON AIR is an application for turning on a light to signal to my family that I am currently on a video call. 
+**onair** is an application for interacting with IoT devices. Along with manual control, this application can detect whether the systems camera or microphone are enabled and turn on an indicator light. 
 
-This app deploys a cronjob script that determines whether the light should be ON or OFF, and then sends a signal to the integrated IoT system.
-
-The application can be configured to respond to three triggers:
-1. When a specified application(s) is running.
-1. When the webcam is active. Webcam activity is determined by:
-    - Apple's `VDC_Assistant` (a USB webcam) is activated.
-    - Apple's `AppleH13CamIn::setGetPowerStateGated` (the onboard camera) is changed.
-1. When Apples `IOAudioEngineState` is equal to 1 (true / enabled). 
-
-<!-- TODO: Smartthings: see the branch `smartthings` -->
-This application supports integrations with _Home Assistant_, and _Apple HomeKit_.
-
-## Pre-Requisites  
-Each supported integration has it's own requirements listed below.
-
-### Home Assistant
--  macOS Monterey 12.7+
-- [Home Assistant](https://www.home-assistant.io/)
-- Home Assistant compatible [device](https://www.home-assistant.io/integrations/) (light, outlet, or switch recommended)
-    - This device **must** already be paired with Home Assistant
-
-### Apple HomeKit
-> **Note:** This app only supports the [new HomeKit architecture](https://support.apple.com/en-us/102287) released in 2023. [Read More](https://www.reddit.com/r/HomeKit/comments/zsir3n/explanation_on_new_homekit_architecture/)
--  macOS Ventura 13.3+
-- Apple [HomeKit](https://www.apple.com/home-app/)
-- Apple [Shortcuts](https://support.apple.com/guide/shortcuts/welcome/ios)
-- HomeKit compatible [device](https://www.apple.com/home-app/accessories/) (light, outlet, or switch recommended)
-    - This device **must** already be paired with HomeKit
+This app can be deployed as a User Agent (launchd LaunchAgent) to run on an interval.
 
 ## Dependencies
+-  macOS Monterey 12.7+
 - [homebrew](https://brew.sh/) => `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
-- [pipx](https://pypa.github.io/pipx/) => `brew install pipx`
-- [poetry](https://python-poetry.org/) => `pipx install poetry`
-    - Note: Do not install poetry using homebrew
-- [invoke](https://github.com/pyinvoke/invoke) => `pipx install invoke`
-- [python 3.11](https://www.python.org/downloads/release/python-3110/) => `brew install python@3.11`
+- [go](https://go.dev) => `brew install go`
+- [make](https://en.wikipedia.org/wiki/Make_(software)) => Generally included with unix like operating systems
+- [Home Assistant](https://www.home-assistant.io/) => with a compatible [device](https://www.home-assistant.io/integrations/) (light, outlet, or switch recommended)
 
-## Setup
-### Home Assistant: Setup Entity
-1. Add your Server URL to `.env` as `HASS_SERVER_URL`.
-1. Add the necessary Home Assistant [integration](https://www.home-assistant.io/getting-started/integration/) for your device.
-    - Capture the [`entity_id`](https://www.home-assistant.io/docs/configuration/customizing-devices/) you wish to control
-    - Add the `entity_id` to `.env` as `HASS_ENTITY_ID`.
-1. Create a Home Assistant [Long Lived Access Token](https://developers.home-assistant.io/docs/auth_api/#long-lived-access-token)
-    - Add the `token` to `.env` as `HASS_ENTITY_ID`.
+## Getting Started
+1. Add `$HOME/.local/bin/` to your $PATH
+    ```sh
+    # zsh
+    echo "export PATH=\"\$PATH:$HOME/.local/bin\"" >> "$HOME/.zprofle"
 
-### HomeKit: Create Apple Shortcuts
-Shortcuts can be created on macOS or iOS. 
+    # bash
+    echo "export PATH=\"\$PATH:$HOME/.local/bin\"" >> "$HOME/.bash_profile"
+    ```
+1. Checkout the repo and build the binary:
+    ```sh
+    make build
+    ```
+1. Create your config file
+    ```sh
+    onair config --create
+    ```
+1. Set your home assistant config values
+    ```sh
+    onair config -e "$HASS_ENDPOINT" -t "$HASS_TOKEN" -d "$HASS_DEVICE"
+    ```
+1. Check the status
+    ```sh
+    onair --status
+    ```
 
-Open the Shortcuts app and create two new shortcuts. One to turn your device ON, and one to turn it OFF. 
+## Services
 
-1. For the action, select the **Home App**
-1. From the list of actions, select **Control**
-1. From the _Scenes and Accessories_ list, select your **device or scene**
-1. Click **Next**
-1. Select your **device's state**
-1. Click **Done**
-1. **Name the shortcut** and click **Done**
+- [Config](#config)
+- [Home Assistant](#home-assistant)
+- [User Agent](#user-agent)
+- [Environment Variables](#environment-variables)
+- [Logging](#logging)
 
-Add the names of these shortcuts to `.env` as `SHORTCUT_ON` and `SHORTCUT_OFF`.
+### Config
+**onair** uses a configuration file. Run `onair config` to see the config options.
 
-### Install
-1. Install project dependencies and create .env
-    - `inv project-setup`
-1. Write convenience scripts and bash aliases
-    - `inv app-install`
-1. Setup the cronjob (if desired)
-    - [#cron-scheduler](#cron-scheduler-recommended)
+The configuration file holds values for interfacing with Home Assistant, as well as configuration settings for what triggers the actions.
 
-### Configuration
-The application is configured via the `.env` file.
+The default path for the config file is `$HOME/.onair/onair.cfg`
 
-| Variable       | Type        | Usage      |
-| -------------- | ----------- | ---------- |
-| TRIGGER_APPS   | List ["str"]| [Process name(s)](#trigger-apps) to trigger the device |
-| ENABLE_VIDEO   | Boolean     | Enable trigger for webcam activation | 
-| ENABLE_AUDIO   | Boolean     | Enable trigger for microphone activation | 
-| SMART_HOME_TYPE   | String     | The IoT system to integrate | 
-| DEVICE_CACHE   | String      | device cache filename |
-| VIDEO_CACHE    | String      | video cache filename |
-| HASS_SERVER_URL    | String      | http://hass.server:8123 |
-| HASS_API_TOKEN    | String      | Home Assistant [Long Lived Access Token](https://developers.home-assistant.io/docs/auth_api/#long-lived-access-token) |
-| HASS_ENTITY_ID    | String      | switch.identifier |
-| SHORTCUT_ON    | String      | name of Homekit shortut for device on |
-| SHORTCUT_OFF   | String      | name of Homekit shortut for device off |
+To specify a configuration file, set the environment variable `ONAIR_CONFIG_FILE_PATH` at runtime.
 
-#### Trigger Apps
-1. Open the application(s) that you want to turn on the light.
-1. Run the following command to find the application's process name. 
-    - `inv discover-process-names -q {app-name}`
-1. Find the process name in the output.
+You can have multiple config files. Why would you want more than one config file? Let's say that you want two devices to turn on under different circumstances? Configuration files are 1:1 with IoT devices, so each device would require it's own config file. Below is an example:
 
-> **Note:** when searching for **_app-name_**, try using a short keyword like _"code"_ rather than _"Visual Studio Code"_
-> 
-> Sometimes, a process name is shortened to _"vscode"_ which would not show up with a multi word query.
->
-> If you are unable to successfully query for the process, run the command without `-q {app-name}` to view *all* running processes. 
-
-### Manual Usage
-A cool party trick is being able to turn the light on or off from the command line. After running the install steps, you can manually control the light with the `onair` and `offair` commands. These commands do not override the cron process.
-
-### Automation
-To automate your ON AIR light, schedule a cron job to run the script `./run-app-status-light.sh`
-
-#### Cron Scheduler (Recommended)
-Use the builtin scheduler to write your crontab entry.
-- `inv manage-cron [options]`
-
-The scheduler accepts the options below:
-```sh
-Options:
-  # the action to perform. Must be "add", "list" or "remove"
-  -a STRING, --action=STRING
-  # run every N minutes. Use 0 for every minute => only for action=add
-  -i INT, --interval-min=INT
-  # starting at hour (24H) => only for action=add
-  -s INT, --start-hour=INT
-  # ending at hour (24H) => only for action=add
-  -e INT, --end-hour=INT
-  # line number to remove => only for action=remove
-  -l INT, --line-num=INT
+```bash
+# Turn on device a
+ONAIR_CONFIG_FILE_PATH=$HOME/.onair/device-a.cfg onair -o
+# Turn off device b
+ONAIR_CONFIG_FILE_PATH=$HOME/.onair/device-b.cfg onair -f
 ```
 
-Examples:
-- `inv manage-cron --action add --interval-min 5 --start-hour 7 --end-hour 15`
-- `inv manage-cron --action remove --line-num 3`
-- `inv manage-cron --action list`
+| VALUE                   | TYPE     | DESCRIPTION                                 |
+|-------------------------|----------|---------------------------------------------|
+| home_assistant_url      | string   | Home Assistant (HASS) endpoint URL          |
+| home_assistant_token    | string   | Home Assistant (HASS) API token             |
+| home_assistant_entity   | string   | Home Assistant (HASS) entity name           |
+| onair_enable_camera     | boolean  | Enable camera detection (true/false)        |
+| onair_enable_microphone | boolean  | Enable microphone detection (true/false)    |
+| scheduler_cron_interval | string   | (optional) cron scheduler for user agent ("* * * * *") |
 
-#### Manually (Legacy)
-1. Open crontab list with `crontab -e`
-2. Add your cron schedule to the crontab list
-3. Save and Exit vim with `:wq`
 
-Sample cron schedules have been provided in the in the `./cronjobs/` directory.
-- Every 5th Minute, MON-FRI 9am-5pm
-- Every Minute, Every Day
+#### Encryption
+Configuration files can be encrypted to protect secrets. Set the encryption key with the environment variable `ONAIR_CONFIG_ENCRYPTION_KEY` - this is a string. If an encryption key is not provided, configuration files will not be encrypted.
 
-> Need help with cron scheduling? Check out [crontab.guru](https://crontab.guru/)
+The key should be an AES key, either 16, 24, or 32 bytes to select AES-128, AES-192, or AES-256.
 
-## Uninstall
-1. Remove convenience scripts and bash aliases
-    - `inv app-uninstall`
-1. Remove the crontab entry, if applicable
-    - `inv manage-cron --action list`
-    - `inv manage-cron --action remove --line-num {N}`
+Keygen:
+```bash
+BYTES=32
+ONAIR_CONFIG_ENCRYPTION_KEY=$(openssl rand -hex $BYTES)
+```
+
+### Home Assistant
+Home Assistant (HASS) serves as the IoT backbone of this project. A pre-configured HASS instance is required.
+
+1. Add the necessary Home Assistant [integration](https://www.home-assistant.io/getting-started/integration/) for your device.
+    - Capture the [`entity_id`](https://www.home-assistant.io/docs/configuration/customizing-devices/) you wish to control
+1. Create a Home Assistant [Long Lived Access Token](https://developers.home-assistant.io/docs/auth_api/#long-lived-access-token)
+
+Add the `home_assistant_url`, `home_assistant_token`, and `home_assistant_entity` to your config.
+
+Once configured, run `onair hass` to see hass options.
+
+#### Cache
+**onair** utilizes a local device state cache. The state cache ensures that the HASS server is not sent unnecessary requests (such as `OFF... OFF... OFF...` or `ON... ON... ON...`).
+
+When the application runs it first determines if the home assistant entity `shouldBeOn` by checking the media device state. Before sending the `shouldBeOn` state to Home Assistant, it checks the cache to see if `entityIsOn`. 
+
+If `entityIsOn == shouldBeOn` (true==true or false==false), no requests are sent. If `entityIsOn != shouldBeOn` (true!=false) then the request is sent to Home Assistant to change the entity state.  When a request is sent, the cache is updated accordingly.
+
+Cache files are stored in `$HOME/.onair/` with the filename of `$ENTITY_NAME + ".cache"`. There will be one cache file per HASS entity.
+
+You can check the cache value with the `onair -c (or onair --status)` command.
+
+The cache also allows the entity to be manually controlled, say via Home Assistant directly, without **onair** constantly overriding a the state.
+
+### User Agent
+
+Schedule **onair** to run as a user agent.
+
+The file `local.onair.plist` contains an interval in seconds:
+```
+    <key>StartInterval</key>
+    <integer>30</integer>
+    <key>RunAtLoad</key>
+```
+Set this value to your desired interval.
+
+> **NOTE:** in `local.onair.plist` you will also see two placeholder values: !HOME! and !USER! - these are replaced by the make command to install the user agent. 
+
+Then run `make launchd-load` to load the service.
+
+If you want to load the service at the top of the next minute to ensure your interval aligns with the minute, run `make launchd-interval`
+
+Run `make launchd-unload` to remove the launch agent.
+
+#### Allow Network Access
+You will need to allow the binary to access devices on your local network. 
+
+When the following pop-up appears, click allow.
+
+![Allow local network access prompt](./images/local-network-access.png)
+
+#### Scheduler
+The user agent allows **onair** to run on an interval, such as every 30 seconds. Sometimes, the desired behavior is to only have the this interval apply during certain time windows, like during the workday (MON-FRI between 9am-5pm).
+
+<!-- TODO: CONFIG VALUE NAME! -->
+This can be accomplished with the optional config value of `scheduler_cron_interval`. With a schedule set, the agent will still run on it's fixed interval. At runtime, it evaluates this cron-style schedule to determine whether work is allowed at that time.
+
+The schedule does not control execution frequency; it defines _time windows during which the agent may perform actions_. On each wake-up, the agent checks whether the current time falls within an allowed window and either proceeds or exits.
+
+Using the above workday example, the config value would be as follows:
+```cron
+# Every minute during business hours (9:00 AM - 4:59 PM)
+# Monday through Friday
+
+# every minute (*)
+# of hours 9 AM through 4 PM (9-16)
+# on every day of the month (*)
+# every month (*)
+# on day of week MON-FRI (1-5)
+
+scheduler_cron_interval="* 9-16 * * 1-5"
+```
+
+> Need help with cron scheduling? Check out [crontab.guru](https://crontab.guru) or [crontab.cronhub.io](https://crontab.cronhub.io)
+
+### Environment Variables
+| service | env var | type | default |
+|---------|---------|------|---------|
+| config  | `ONAIR_CONFIG_FILE_PATH` | string(Path) | `$HOME/.onair/onair.cfg` |
+| config  | `ONAIR_CONFIG_ENCRYPTION_KEY` | string(16, 24, or 32 bytes) | null |
+| logger  | `ONAIR_LOG_FILEPATH` | string(path) |  `$HOME/.onair/onair.log` |
+
+### Logging
+**onair** writes log files to `$HOME/.onair/onair.log`. The logs self-rotate, and auto cleanup after enough time passes.
+
+The log location can be changed with the `ONAIR_LOG_FILEPATH` env var.

@@ -1,0 +1,136 @@
+package cmd
+
+// TODO: ensure all this works
+// - onair		 	  checks if the light should be on, and acts accordingly
+// - onair --on 	  turns on the light
+// - onair --off 	  turns off the light
+// - onair --status   checks the status of the triggers and devices
+// - onair config ... manages configuration
+// - onair hass ...   interacts with home assistant directly
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/cakeholeDC/on-air/appconfig"
+	"github.com/cakeholeDC/on-air/cmd/config"
+	"github.com/cakeholeDC/on-air/cmd/hassCmd"
+	"github.com/cakeholeDC/on-air/hass"
+	"github.com/cakeholeDC/on-air/logger"
+	"github.com/cakeholeDC/on-air/media"
+	"github.com/cakeholeDC/on-air/schedule"
+	"github.com/fatih/color"
+	"github.com/spf13/cobra"
+	"github.com/zs5460/art"
+)
+
+var about string = `
+onair is a command line tool to control home assistant entities.
+
+this tool will check if the camera and/or microphone is active and toggle a device accordingly. 
+
+run with flags to control the device directly.
+`
+
+var log = logger.New("rootcmd")
+var red = color.New(color.FgRed).Add(color.Bold)
+
+var onFlag string = "on"
+var offFlag string = "off"
+var checkFlag string = "status"
+
+var rootCmd = cobra.Command{
+	Use:   "onair",
+	Short: "onair is a command line tool to control home assistant entities",
+	Long:  art.String("onair") + about,
+	Run: func(cmd *cobra.Command, args []string) {
+		if cmd.Flags().NFlag() == 0 {
+			// if the command is run without any flags and there is no configuration file present, show help
+			cfg, err := appconfig.GetConfig()
+			if err != nil || cfg == nil {
+				cmd.Help()
+				red.Println("\nonair requires a configuration file. Run 'onair config --help' for more information.")
+
+				return
+			}
+
+			scheduler, _ := schedule.NewSchedule(cfg.SchedulerCronInterval)
+			if !scheduler.CanRun() {
+				log.Info("Current time is outside of the scheduled interval. Exiting.")
+				fmt.Printf(
+					"Current time (%s) is outside of the scheduled interval (%s). Exiting.\n",
+					time.Now().Format("03:04:05 PM"),
+					cfg.SchedulerCronInterval,
+				)
+
+				return
+			}
+
+			// otherwise, run in 'fast mode' - check if it should be on and act accordingly
+			shouldBeOn := media.ShouldBeOn()
+			if shouldBeOn {
+				hass.SetEntityState(true, false)
+				hassCmd.PrintOnAirASCII("on")
+			} else {
+				hass.SetEntityState(false, false)
+				hassCmd.PrintOnAirASCII("off")
+			}
+
+			return
+		}
+
+		turnOn, _ := cmd.Flags().GetBool(onFlag)
+		turnOff, _ := cmd.Flags().GetBool(offFlag)
+		check, _ := cmd.Flags().GetBool(checkFlag)
+
+		if turnOn {
+			log.Info(fmt.Sprintf("--%s => device turned ON manually", onFlag))
+			// Manual state changes skip the cache check to force the action
+			_, err := hass.SetEntityState(true, true)
+			if err == nil {
+				hassCmd.PrintOnAirASCII("on")
+			} else {
+				fmt.Printf("Failed to turn on the device: %s\n", red.Sprint(err))
+			}
+		} else if turnOff {
+			log.Info(fmt.Sprintf("--%s => device turned OFF manually", offFlag))
+			// Manual state changes skip the cache check to force the action
+			_, err := hass.SetEntityState(false, true)
+			if err == nil {
+				hassCmd.PrintOnAirASCII("off")
+			} else {
+				fmt.Printf("Failed to turn off the device: %s\n", red.Sprint(err))
+			}
+		} else if check {
+			log.Info(fmt.Sprintf("--%s => running status checks...", checkFlag))
+			media.PrintMediaStates()
+			entity, err := hass.GetEntity()
+			if err != nil {
+				fmt.Printf("Failed to get entity state: %s\n", red.Sprint(err))
+			} else {
+				entity.PrintState()
+				hass.PrintCache()
+			}
+		} else {
+			log.Warn("No valid flag provided")
+		}
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(config.ConfigCmd)
+	rootCmd.AddCommand(hassCmd.HassCmd)
+
+	rootCmd.PersistentFlags().BoolP(onFlag, "o", false, "Turn on the device")
+	rootCmd.PersistentFlags().BoolP(offFlag, "f", false, "Turn off the device")
+	rootCmd.PersistentFlags().BoolP(
+		checkFlag,
+		"c",
+		false,
+		"Check the status of the media triggers and the device. Queries for current state.",
+	)
+}
+
+func Execute() {
+	rootCmd.Execute()
+}
