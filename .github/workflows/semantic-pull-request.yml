@@ -39,12 +39,9 @@ jobs:
             config
           # Require a scope to be provided
           requireScope: false
-          # Ensure types and scopes are lowercase
-          subjectPattern: ^(?![A-Z]).+$
-          subjectPatternError: |
-            The subject "{subject}" found in the pull request title "{title}"
-            didn't match the configured pattern. Please ensure that the subject
-            doesn't start with an uppercase character.
+          disallowScopes: |
+            release
+            [A-Z]+
           # Validate the entire PR title
           validateSingleCommit: false
           # Validate the entire title matches conventional commit format
